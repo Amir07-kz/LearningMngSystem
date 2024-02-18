@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration page</title>
+    <title>Login Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        input[type="text"], input[type="password"], input[type="email"], input[type="submit"] {
+        input[type="email"], input[type="password"], input[type="submit"] {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -44,13 +44,9 @@
     </style>
 </head>
 <body>
-<form action="/registration" method="post">
-    <h2>Registration</h2>
+<form action="/authentification" method="post">
+    <h2>Login</h2>
     {{ csrf_field() }}
-    <input type="text" name="name" placeholder="Name">
-    {% if errors.bags.default.messages.name %}
-        <div class="error">{{ errors.bags.default.messages.name|first }}</div>
-    {% endif %}
     <input type="email" name="email" placeholder="Email">
     {% if errors.bags.default.messages.email %}
         <div class="error">{{ errors.bags.default.messages.email|first }}</div>
@@ -59,7 +55,7 @@
     {% if errors.bags.default.messages.password %}
         <div class="error">{{ errors.bags.default.messages.password|first }}</div>
     {% endif %}
-    <input type="submit" value="Registration">
+    <input type="submit" value="Login">
 </form>
 </body>
 </html>
