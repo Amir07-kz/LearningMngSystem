@@ -1,7 +1,9 @@
 <?php
 
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\RegistrationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Auth\AuthentificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,10 +15,14 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/registration', [RegistrationController::class, 'index']);
 
-Route::get('/registration', [RegisterController::class, 'index']);
+Route::post('/registration', [RegistrationController::class, 'store']);
 
-Route::post('/registration', [RegisterController::class, 'register']);
+Route::get('/authentification', [AuthentificationController::class, 'index']);
+
+Route::post('/authentification', [AuthentificationController::class, 'authenticate']);
+
+Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
+
+Route::post('/logout', [AuthentificationController::class, 'logout']);
