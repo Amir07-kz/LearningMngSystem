@@ -3,7 +3,7 @@
 use App\Http\Controllers\Auth\RegistrationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Auth\AuthentificationController;
+use App\Http\Controllers\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,10 +19,10 @@ Route::get('/registration', [RegistrationController::class, 'index']);
 
 Route::post('/registration', [RegistrationController::class, 'store']);
 
-Route::get('/authentification', [AuthentificationController::class, 'index']);
+Route::get('/login', [LoginController::class, 'index']);
 
-Route::post('/authentification', [AuthentificationController::class, 'authenticate']);
+Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
 
-Route::post('/logout', [AuthentificationController::class, 'logout']);
+Route::post('/logout', [LoginController::class, 'logout']);

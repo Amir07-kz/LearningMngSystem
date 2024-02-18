@@ -7,14 +7,14 @@ use Dflydev\DotAccessData\Data;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class AuthentificationController extends Controller
+class LoginController extends Controller
 {
     public function index()
     {
-        return view('authentification');
+        return view('login');
     }
 
-    public function authenticate(Request $request)
+    public function login(Request $request)
     {
         $credentials = $request->validate([
             'email' => 'required|string|email',
