@@ -7,11 +7,14 @@ use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
-//    public function index() {
-//        return view('home');
-//    }
+    public function index()
+    {
+        $isAuthenticated = Auth::check();
+        $username = $isAuthenticated ? Auth::user()->name : null;
 
-    public function index() {
-        dump(Auth::id());
+        return view('home', [
+            'is_authenticated' => $isAuthenticated,
+            'username' => $username,
+        ]);
     }
 }
