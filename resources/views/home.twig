@@ -1,1 +1,55 @@
-Home
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .toolbar {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: right;
+        }
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="toolbar">
+    {% if auth.check() %}
+        <a href="{{ route('profile') }}" class="button">My account</a>
+        <a href="{{ route('login') }}" class="button">Log in</a>
+        <a href="{{ route('registration') }}" class="button">Registration</a>
+    {% endif %}
+</div>
+<div class="container">
+    <h1>Welcome!</h1>
+    {% if is_authenticated %}
+        <p>Hello, {{ username }}!</p>
+{#        <a href="{{ route('logout') }}" class="button">Exit</a>#}
+    {% endif %}
+</div>
+</body>
+</html>
