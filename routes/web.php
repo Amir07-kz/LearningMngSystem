@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\RegistrationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CourseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,12 @@ Route::get('/login', [LoginController::class, 'index']);
 
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 
-Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
+Route::get('/', [HomeController::class, 'index'])->name('/');
 
-Route::post('/logout', [LoginController::class, 'logout']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/courses/create', [CourseController::class, 'index']);
+
+Route::post('/courses/create', [CourseController::class, 'store']);
+
+Route::get('/courses/list', [CourseController::class, 'courseList'])->name('courses_list');
