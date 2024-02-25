@@ -48,7 +48,10 @@
     <h1>Welcome!</h1>
     {% if is_authenticated %}
         <p>Hello, {{ username }}!</p>
-{#        <a href="{{ route('logout') }}" class="button">Exit</a>#}
+        <form action="{{ route('logout') }}" method="POST">
+            {{ csrf_field() }}
+            <button type="submit">Exit</button>
+        </form>
     {% endif %}
 </div>
 </body>

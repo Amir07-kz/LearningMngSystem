@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>—писок курсов</title>
+    <style>
+        .course-card {
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            transition: 0.3s;
+            width: 300px; /* ”становите фиксированную ширину дл€ карточек */
+            border-radius: 5px;
+            margin: 10px;
+            background-color: white;
+            display: inline-block; /*  арточки будут выстроены в линию */
+        }
+
+        .course-card:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+
+        .container {
+            padding: 2px 16px;
+        }
+
+        .course-title {
+            font-size: 24px;
+            color: #007bff;
+        }
+
+        .course-description {
+            color: grey;
+            font-size: 18px;
+        }
+
+        .course-duration {
+            color: grey;
+            font-size: 16px;
+        }
+
+        .course-list {
+            display: flex;
+            flex-direction: row; /* Ёлементы будут расположены в р€д */
+            flex-wrap: wrap; /* Ёлементы перенесутс€ на новую строку, если не помещаютс€ */
+            align-items: flex-start;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="course-list">
+    {% for course in courses %}
+        <div class="course-card">
+            <div class="container">
+                <h4 class="course-title"><b>{{ course.title }}</b></h4>
+                <p class="course-description">{{ course.description }}</p>
+                <p class="course-duration">{{ course.duration }} часов</p>
+            </div>
+        </div>
+    {% else %}
+        <p> урсы не найдены.</p>
+    {% endfor %}
+</div>
+</body>
+</html>
