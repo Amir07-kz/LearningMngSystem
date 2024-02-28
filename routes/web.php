@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\SlideController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,3 +34,11 @@ Route::get('/courses/create', [CourseController::class, 'index']);
 Route::post('/courses/create', [CourseController::class, 'store']);
 
 Route::get('/courses/list', [CourseController::class, 'courseList'])->name('courses_list');
+
+Route::post('/courses/{course}/slides', [SlideController::class, 'store']);
+
+Route::get('/slides/{slide}/edit', [SlideController::class, 'edit'])->name('slides.edit');
+
+Route::put('/slides/{slide}', [SlideController::class, 'update'])->name('slides.update');
+
+Route::get('/courses/{course}/slides/create', [SlideController::class, 'create'])->name('slides.create');
