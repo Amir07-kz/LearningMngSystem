@@ -55,6 +55,7 @@
                 <h4 class="course-title"><b>{{ course.title }}</b></h4>
                 <p class="course-description">{{ course.description }}</p>
                 <p class="course-duration">{{ course.duration }} часов</p>
+                <a href="{{ url('/courses/' ~ course.id ~ '/slides') }}">Перейти к слайдам</a>
             </div>
         </div>
     {% else %}

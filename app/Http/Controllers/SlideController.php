@@ -7,6 +7,17 @@ use Illuminate\Http\Request;
 
 class SlideController extends Controller
 {
+//    public function index($courseId)
+//    {
+//        return view('create_slides', ['courseId' => $courseId]);
+//    }
+    public function index($courseId)
+    {
+        $slides = Slide::where('course_id', $courseId)->orderBy('position')->get();
+        return view('create_slides', ['courseId' => $courseId, 'slides' => $slides]);
+    }
+
+
     public function edit(Slide $slide)
     {
         return view('slides.edit', compact('slide'));
@@ -35,12 +46,21 @@ class SlideController extends Controller
 
         return back()->with('success', 'Slide updated successfully.');
     }
-
-    public function create($courseId)
+    public function store(Request $request, $courseId)
     {
-        // «десь $courseId - это идентификатор курса, к которому вы хотите добавить слайды.
-        // ¬ы можете использовать этот ID, чтобы передать данные курса в представление, если это необходимо.
-        return view('slides.create', compact('courseId'));
+//        dump($courseId);
+//        dd($request);
+        $data = $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+        ]);
+
+        $slide = new Slide();
+        $slide->fill($data);
+        $slide->course_id = $courseId;
+        $slide->save();
+
+        return redirect()->route('slide.create', $courseId)->with('success', 'Slide created successfully.');
     }
 
 }

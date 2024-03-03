@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Slide</title>
+</head>
+<body>
+<h1>Create Slide for Course #{{ courseId }}</h1>
+<form action="" method="post">
+    {{ csrf_field() }}
+    <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+    </div>
+    <div>
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" required></textarea>
+    </div>
+    <!-- Другие поля для слайда -->
+    <button type="submit">Create Slide</button>
+</form>
+</body>
+</html>
