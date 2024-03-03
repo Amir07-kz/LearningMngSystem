@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список слайдов</title>
+    <style>
+        .container {
+            display: flex;
+        }
+        .slide-list {
+            width: 30%;
+            border-right: 1px solid #ddd;
+        }
+        /* Дополнительные стили */
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="slide-list">
+        <h2>Слайды курса #{{ courseId }}</h2>
+        <ul>
+            {% for slide in slides %}
+                <li>{{ slide.title }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="content">
+        <!-- Содержимое выбранного слайда или форма -->
+    </div>
+</div>
+</body>
+</html>

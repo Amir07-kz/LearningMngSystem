@@ -9,7 +9,7 @@ class CourseController extends Controller
 {
     public function index()
     {
-        return view('courses_create');
+        return view('course_create');
     }
 
     public function courseList()
@@ -35,4 +35,10 @@ class CourseController extends Controller
 
         return redirect()->route('courses_list')->with('success', 'Курс успешно создан');
     }
+
+    public function create($courseId)
+    {
+        return view('courses.slides.create', ['courseId' => $courseId]);
+    }
+
 }

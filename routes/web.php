@@ -35,10 +35,18 @@ Route::post('/courses/create', [CourseController::class, 'store']);
 
 Route::get('/courses/list', [CourseController::class, 'courseList'])->name('courses_list');
 
-Route::post('/courses/{course}/slides', [SlideController::class, 'store']);
+Route::post('/courses/{course}/slide/create', [SlideController::class, 'store'])->name('slides.store');
 
-Route::get('/slides/{slide}/edit', [SlideController::class, 'edit'])->name('slides.edit');
+Route::get('/courses/{course}/slide/create', [SlideController::class, 'index'])->name('slide.create');
 
-Route::put('/slides/{slide}', [SlideController::class, 'update'])->name('slides.update');
+//Route::get('/courses/{course}/slide/edit', [SlideController::class, 'index']);
 
-Route::get('/courses/{course}/slides/create', [SlideController::class, 'create'])->name('slides.create');
+//Route::post('/courses/{course}/slides', [SlideController::class, 'store']);
+//
+//Route::get('/slides/{slide}/edit', [SlideController::class, 'edit'])->name('slides.edit');
+//
+//Route::put('/slides/{slide}', [SlideController::class, 'update'])->name('slides.update');
+//
+//Route::get('/courses/{course}/slides/create', [SlideController::class, 'create'])->name('slides.create');
+//
+//Route::get('/courses/{course}/slides/{slide}', [SlideController::class, 'index']);
