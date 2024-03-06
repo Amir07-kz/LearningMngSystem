@@ -2,30 +2,25 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Список слайдов</title>
-    <style>
-        .container {
-            display: flex;
-        }
-        .slide-list {
-            width: 30%;
-            border-right: 1px solid #ddd;
-        }
-        /* Дополнительные стили */
-    </style>
+    <title>Details of Slide #{{ slide.slide_number }}</title>
 </head>
 <body>
 <div class="container">
     <div class="slide-list">
-        <h2>Слайды курса #{{ courseId }}</h2>
+        <h2>Slides of Course #{{ courseId }}</h2>
         <ul>
-            {% for slide in slides %}
-                <li>{{ slide.title }}</li>
+            {% for slideItem in slides %}
+                <li>
+                    <a href="/courses/{{ courseId }}/slide/{{ slideItem.slide_number }}">
+                        {{ slideItem.title }}
+                    </a>
+                </li>
             {% endfor %}
         </ul>
     </div>
     <div class="content">
-        <!-- Содержимое выбранного слайда или форма -->
+        <h1>{{ slide.title }}</h1>
+        <p>{{ slide.description }}</p>
     </div>
 </div>
 </body>
