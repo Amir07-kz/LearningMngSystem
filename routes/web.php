@@ -39,6 +39,8 @@ Route::post('/courses/{course}/slide/create', [SlideController::class, 'store'])
 
 Route::get('/courses/{course}/slide/create', [SlideController::class, 'index'])->name('slide.create');
 
+Route::get('/courses/{course}/slide/{slide}', [SlideController::class, 'show'])->name('slides.show');
+
 //Route::get('/courses/{course}/slide/edit', [SlideController::class, 'index']);
 
 //Route::post('/courses/{course}/slides', [SlideController::class, 'store']);

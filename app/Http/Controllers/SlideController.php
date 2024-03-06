@@ -13,10 +13,20 @@ class SlideController extends Controller
 //    }
     public function index($courseId)
     {
-        $slides = Slide::where('course_id', $courseId)->orderBy('position')->get();
+        $slides = Slide::where('course_id', $courseId)->orderBy('slide_number')->get();
         return view('create_slides', ['courseId' => $courseId, 'slides' => $slides]);
     }
 
+    public function show($courseId, $slideNumber)
+    {
+        $slide = Slide::where('course_id', $courseId)->where('slide_number', $slideNumber)->firstOrFail();
+        $slides = Slide::where('course_id', $courseId)->orderBy('slide_number')->get();
+        return view('slides_show', [
+            'slide' => $slide,
+            'slides' => $slides,
+            'courseId' => $courseId
+        ]);
+    }
 
     public function edit(Slide $slide)
     {
@@ -48,8 +58,6 @@ class SlideController extends Controller
     }
     public function store(Request $request, $courseId)
     {
-//        dump($courseId);
-//        dd($request);
         $data = $request->validate([
             'title' => 'required',
             'description' => 'required',
@@ -58,6 +66,7 @@ class SlideController extends Controller
         $slide = new Slide();
         $slide->fill($data);
         $slide->course_id = $courseId;
+        $slide->slide_number = Slide::where('course_id', $courseId)->max('slide_number') + 1;
         $slide->save();
 
         return redirect()->route('slide.create', $courseId)->with('success', 'Slide created successfully.');
