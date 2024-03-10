@@ -18,7 +18,6 @@ class CourseController extends Controller
         return view('courses_list', ['courses' => $courses]);
     }
 
-    // Метод для сохранения нового курса
     public function store(Request $request)
     {
         $request->validate([
