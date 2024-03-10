@@ -12,12 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Шаг 1: Добавить столбец, допускающий значения NULL
         Schema::table('slides', function (Blueprint $table) {
             $table->integer('slide_number')->nullable();
         });
 
-        // Шаг 2: Заполнить существующие строки
         Slide::all()->each(function (Slide $slide) {
             $maxNumber = Slide::where('course_id', $slide->course_id)->max('slide_number') ?? 0;
             $slide->slide_number = $maxNumber + 1;

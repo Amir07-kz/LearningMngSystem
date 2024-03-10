@@ -33,6 +33,10 @@ Route::get('/courses/create', [CourseController::class, 'index']);
 
 Route::post('/courses/create', [CourseController::class, 'store']);
 
+Route::get('/courses/edit', [CourseController::class, 'edit']);
+
+//Route::post('/courses/edi);
+
 Route::get('/courses/list', [CourseController::class, 'courseList'])->name('courses_list');
 
 Route::post('/courses/{course}/slide/create', [SlideController::class, 'store'])->name('slides.store');

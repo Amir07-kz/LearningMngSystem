@@ -7,11 +7,11 @@
         .course-card {
             box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
             transition: 0.3s;
-            width: 300px; /* Установите фиксированную ширину для карточек */
+            width: 300px;
             border-radius: 5px;
             margin: 10px;
             background-color: white;
-            display: inline-block; /* Карточки будут выстроены в линию */
+            display: inline-block;
         }
 
         .course-card:hover {
@@ -54,8 +54,11 @@
             <div class="container">
                 <h4 class="course-title"><b>{{ course.title }}</b></h4>
                 <p class="course-description">{{ course.description }}</p>
-                <p class="course-duration">{{ course.duration }} часов</p>
-                <a href="{{ url('/courses/' ~ course.id ~ '/slides') }}">Перейти к слайдам</a>
+                <p class="course-duration">{{ course.duration }} hours</p>
+                {% if slide %}
+                    <a href="{{ url('/courses/' ~ course.id ~ '/slide/create') }}">Preview</a>
+                {% endif %}
+                <a href="{{ url('/courses/' ~ course.id ~ '/slide/create') }}">Edit slide</a>
             </div>
         </div>
     {% else %}

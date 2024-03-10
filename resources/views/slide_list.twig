@@ -3,24 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <title>Details of Slide #{{ slide.slide_number }}</title>
+    <style>
+        .course-container {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex; /* Добавляем flexbox для основного контейнера */
+            height: 100vh; /* Задаем полную высоту экрана */
+        }
+
+        .course-header {
+            background-color: #93c0f8;
+            color: black;
+            padding: 3px 3px;
+            display: flex;
+            align-items: center;
+            position: absolute; /* Заставляем header быть поверх контента */
+            width: 100%; /* Header занимает всю ширину */
+            box-sizing: border-box; /* Учитываем padding и border в ширине */
+        }
+
+        .lessons-container {
+            display: flex; /* Используем flexbox для размещения списка и контента */
+            width: 100%; /* Занимаем всю доступную ширину */
+            padding-top: 50px; /* Отступ сверху равен высоте header */
+        }
+
+        .lesson-list {
+            background-color: white;
+            width: 25%; /* Задаем ширину списка слайдов */
+            margin-top: 5px;
+        }
+
+        .lesson-item {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 10px;
+            list-style: none;
+        }
+
+        .lesson-item:last-child {
+            border-bottom: none;
+        }
+
+        .lesson-item a {
+            text-decoration: none;
+            color: black;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .lesson-item a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .content {
+            flex-grow: 1; /* Заставляем content занимать оставшееся пространство */
+            padding: 10px; /* Добавляем padding для content */
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-    <div class="slide-list">
-        <h2>Slides of Course #{{ courseId }}</h2>
-        <ul>
-            {% for slideItem in slides %}
-                <li>
-                    <a href="/courses/{{ courseId }}/slide/{{ slideItem.slide_number }}">
-                        {{ slideItem.title }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
+<div class="course-container">
+    <div class="course-header">
+        <a href="{{ route('courses_list') }}"><-</a>
+        <h1>Introduction to PHP</h1>
     </div>
-    <div class="content">
-        <h1>{{ slide.title }}</h1>
-        <p>{{ slide.description }}</p>
+    <div class="lessons-container">
+        <div class="lesson-list">
+            <h2>Lessons</h2>
+            <ul>
+                {% for slideItem in slides %}
+                    <li class="lesson-item">
+                        <a href="/courses/{{ courseId }}/slide/{{ slideItem.slide_number }}">
+                            <span class="lesson-title">{{ slideItem.title }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+                <li class="lesson-item">
+                    <a href="{{ route('slide.create', {'course': courseId}) }}">+</a>
+                </li>
+            </ul>
+        </div>
+        <!-- наверное лучше сделать чтобы контент был отдельно -->
+        <div class="content">
+            <h1>{{ slide.title }}</h1>
+            <p>{{ slide.description }}</p>
+        </div>
     </div>
 </div>
 </body>
