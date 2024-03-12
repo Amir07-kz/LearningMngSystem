@@ -7,8 +7,8 @@
         .course-container {
             font-family: 'Arial', sans-serif;
             background-color: #f0f0f0;
-            display: flex; /* Добавляем flexbox для основного контейнера */
-            height: 100vh; /* Задаем полную высоту экрана */
+            display: flex;
+            height: 100vh;
         }
 
         .course-header {
@@ -17,20 +17,23 @@
             padding: 3px 3px;
             display: flex;
             align-items: center;
-            position: absolute; /* Заставляем header быть поверх контента */
-            width: 100%; /* Header занимает всю ширину */
-            box-sizing: border-box; /* Учитываем padding и border в ширине */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 1000;
         }
 
         .lessons-container {
-            display: flex; /* Используем flexbox для размещения списка и контента */
-            width: 100%; /* Занимаем всю доступную ширину */
-            padding-top: 50px; /* Отступ сверху равен высоте header */
+            display: flex;
+            width: 100%;
+            padding-top: 50px;
         }
 
         .lesson-list {
             background-color: white;
-            width: 25%; /* Задаем ширину списка слайдов */
+            width: 25%;
             margin-top: 5px;
         }
 
@@ -57,8 +60,8 @@
         }
 
         .content {
-            flex-grow: 1; /* Заставляем content занимать оставшееся пространство */
-            padding: 10px; /* Добавляем padding для content */
+            flex-grow: 1;
+            padding: 10px;
         }
     </style>
 </head>
@@ -84,10 +87,28 @@
                 </li>
             </ul>
         </div>
-        <!-- наверное лучше сделать чтобы контент был отдельно -->
         <div class="content">
-            <h1>{{ slide.title }}</h1>
-            <p>{{ slide.description }}</p>
+            <br>
+            <form action="{{ route('slide.update', {'course': courseId, 'slide': slide.slide_number}) }}" method="post" enctype="multipart/form-data">
+                {{ csrf_field() }}
+                <div>
+                    <label for="title">Slide Title:</label>
+                    <input type="text" id="title" name="title" required value="{{ slide.title }}">
+                </div>
+                <div>
+                    <label for="description">Slide Description:</label>
+                    <textarea id="description" name="description">{{ slide.description }}</textarea>
+                </div>
+                <div>
+                    <label for="position">Slide Position:</label>
+                    <input type="number" id="position" name="position" value="{{ slide.position }}">
+                </div>
+                <div>
+                    <label for="audio">Slide Audio (optional):</label>
+                    <input type="file" id="audio" name="audio" accept=".mp3, .wav">
+                </div>
+                <button type="submit">Update Slide</button>
+            </form>
         </div>
     </div>
 </div>
