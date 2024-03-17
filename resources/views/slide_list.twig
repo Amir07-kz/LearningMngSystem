@@ -59,6 +59,28 @@
             background-color: #f0f0f0;
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        }
+
+
         .content {
             flex-grow: 1;
             padding: 10px;
@@ -83,9 +105,13 @@
                     </li>
                 {% endfor %}
                 <li class="lesson-item">
-                    <a href="{{ route('slide.create', {'course': courseId}) }}">+</a>
+                    <a class="add_slide">+</a>
                 </li>
             </ul>
+        </div>
+        <div id="myModal" class="modal" style="display: none;">
+            <div class="modal-content">
+            </div>
         </div>
         <div class="content">
             <br>
@@ -113,4 +139,34 @@
     </div>
 </div>
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var addSlideButton = document.querySelector('.add_slide');
+        if (addSlideButton) {
+            addSlideButton.addEventListener('click', function(event) {
+                event.preventDefault();
+                fetch('{{ route('slide.create', {'course': courseId}) }}')
+                    .then(response => response.text())
+                    .then(html => {
+                        var modal = document.getElementById('myModal');
+                        if (modal) {
+                            var modalContent = modal.querySelector('.modal-content');
+                            modalContent.innerHTML = html;
+                            modal.style.display = 'block';
+
+                            var closeButton = modal.querySelector('.close');
+                            if (closeButton) {
+                                closeButton.onclick = function() {
+                                    modal.style.display = 'none';
+                                }
+                            }
+                        } else {
+                            console.error('Modal element not found');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        }
+    });
+</script>
 </html>

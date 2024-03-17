@@ -7,10 +7,6 @@ use Illuminate\Http\Request;
 
 class SlideController extends Controller
 {
-//    public function index($courseId)
-//    {
-//        return view('create_slides', ['courseId' => $courseId]);
-//    }
     public function index($courseId)
     {
         $slides = Slide::where('course_id', $courseId)->orderBy('slide_number')->get();
@@ -27,11 +23,6 @@ class SlideController extends Controller
             'courseId' => $courseId
         ]);
     }
-
-    public function edit(Slide $slide)
-    {
-        return view('slides.edit', compact('slide'));
-    }
     public function store(Request $request, $courseId)
     {
         $data = $request->validate([
@@ -45,7 +36,7 @@ class SlideController extends Controller
         $slide->slide_number = Slide::where('course_id', $courseId)->max('slide_number') + 1;
         $slide->save();
 
-        return redirect()->route('slide.create', $courseId)->with('success', 'Slide created successfully.');
+        return redirect()->back();
     }
 
     public function update(Request $request, $courseId, $slideId) {

@@ -5,27 +5,29 @@
     <title>Add Slide</title>
 </head>
 <body>
-<h1>Add New Slide to Course #{{ courseId }}</h1>
-<form action="{{ route('slides.store', {'course': courseId}) }}" method="post" enctype="multipart/form-data">
-    {{ csrf_field() }}
-    <div>
-        <label for="title">Slide Title:</label>
-        <input type="text" id="title" name="title" required>
-    </div>
-    <div>
-        <label for="description">Slide Description:</label>
-        <textarea id="description" name="description"></textarea>
-    </div>
-    <div>
-        <label for="position">Slide Position:</label>
-        <input type="number" id="position" name="position">
-    </div>
-    <div>
-        <label for="audio">Slide Audio (optional):</label>
-        <input type="file" id="audio" name="audio" accept=".mp3, .wav">
-    </div>
-    <button type="submit">Add Slide</button>
-</form>
-{% include 'slide_list.twig' with {'slides': slides} %}
+<div class="modal-content">
+    <span class="close">&times;</span>
+    <h1>Add New Slide to Course #{{ courseId }}</h1>
+    <form action="{{ route('slides.store', {'course': courseId}) }}" method="post" enctype="multipart/form-data">
+        {{ csrf_field() }}
+        <div>
+            <label for="title">Slide Title:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div>
+            <label for="description">Slide Description:</label>
+            <textarea id="description" name="description"></textarea>
+        </div>
+        <div>
+            <label for="position">Slide Position:</label>
+            <input type="number" id="position" name="position">
+        </div>
+        <div>
+            <label for="audio">Slide Audio (optional):</label>
+            <input type="file" id="audio" name="audio" accept=".mp3, .wav">
+        </div>
+        <button type="submit">Add Slide</button>
+    </form>
+</div>
 </body>
 </html>
