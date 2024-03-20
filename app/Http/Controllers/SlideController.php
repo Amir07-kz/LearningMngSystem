@@ -54,10 +54,13 @@ class SlideController extends Controller
             $slide->description = $validatedData['description'];
             $slide->position = $validatedData['position'];
             $slide->save();
-
-            return redirect()->back();
-        } else {
-            return back()->with('error', 'Slide not found');
         }
+
+        return redirect()->back();
+    }
+
+    public function remove($courseId, $slideId) {
+        $slide = Slide::where('course_id', $courseId)->where('slide_number', $slideId)->delete();
+        return redirect()->back();
     }
 }

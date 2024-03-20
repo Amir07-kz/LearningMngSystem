@@ -80,11 +80,24 @@
             box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
         }
 
-
         .content {
             flex-grow: 1;
             padding: 10px;
         }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-menu {
+            display: none;
+        }
+
+        .show {
+            display: block;
+        }
+
     </style>
 </head>
 <body>
@@ -100,10 +113,20 @@
                 {% for slideItem in slides %}
                     <li class="lesson-item">
                         <a href="/courses/{{ courseId }}/slide/{{ slideItem.slide_number }}">
-                            <span class="lesson-title">{{ slideItem.title }}</span>
+                            <span class="lesson-title">{{ slideItem.title }}</span>{{ slideItem.slide_number }}
+                            <form action="{{ route('slide.remove', {'course': courseId, 'slide': slide.slide_number}) }}" method="post">
+                                {{ csrf_field() }}
+                                <button class="icon-duplicate">Delete</button>
+                                <input type="hidden" name="_method" value="DELETE">
+                            </form>
                         </a>
                     </li>
                 {% endfor %}
+                    <div class="dropdown">
+                        <div class="dropdown-menu">
+                            <button class="dropdown-toggle">+</button>
+                        </div>
+                    </div>
                 <li class="lesson-item">
                     <a class="add_slide">+</a>
                 </li>
@@ -168,5 +191,24 @@
             });
         }
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var dropdown = document.querySelector('.dropdown');
+        var dropdownToggle = dropdown.querySelector('.dropdown-toggle');
+        var dropdownMenu = dropdown.querySelector('.dropdown-menu');
+
+        dropdownToggle.addEventListener('click', function(event) {
+            event.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+        });
+
+        // Закрытие dropdown, если клик вне его области
+        window.addEventListener('click', function(event) {
+            if (!dropdown.contains(event.target)) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+    });
+
 </script>
 </html>
