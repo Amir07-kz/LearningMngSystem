@@ -7,12 +7,29 @@ use Illuminate\Http\Request;
 
 class SlideController extends Controller
 {
+//    public function index($courseId)
+//    {
+//        $slides = Slide::where('course_id', $courseId)->orderBy('slide_number')->get();
+//        return view('slide_list', ['courseId' => $courseId, 'slides' => $slides]);
+//    }
     public function index($courseId)
     {
         $slides = Slide::where('course_id', $courseId)->orderBy('slide_number')->get();
         return view('create_slides', ['courseId' => $courseId, 'slides' => $slides]);
     }
 
+    public function firstSlide($courseId)
+    {
+        $firstSlide = Slide::where('course_id', $courseId)
+            ->orderBy('slide_number', 'asc')
+            ->first();
+
+        if (!$firstSlide) {
+            return view('slide_list', ['courseId' => $courseId]);
+        }
+
+        return redirect()->to('/courses/' . $courseId . '/slide/' . $firstSlide->slide_number);
+    }
     public function show($courseId, $slideNumber)
     {
         $slide = Slide::where('course_id', $courseId)->where('slide_number', $slideNumber)->firstOrFail();

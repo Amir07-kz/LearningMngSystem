@@ -37,6 +37,8 @@ Route::get('/courses/edit', [CourseController::class, 'edit']);
 
 Route::get('/courses/list', [CourseController::class, 'courseList'])->name('courses_list');
 
+Route::get('/courses/{course}/slide/', [SlideController::class, 'firstSlide'])->name('slide.first');
+
 Route::post('/courses/{course}/slide/create', [SlideController::class, 'store'])->name('slides.store');
 
 Route::get('/courses/{course}/slide/create', [SlideController::class, 'index'])->name('slide.create');

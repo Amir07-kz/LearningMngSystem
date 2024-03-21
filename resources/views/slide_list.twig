@@ -192,23 +192,23 @@
         }
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        var dropdown = document.querySelector('.dropdown');
-        var dropdownToggle = dropdown.querySelector('.dropdown-toggle');
-        var dropdownMenu = dropdown.querySelector('.dropdown-menu');
-
-        dropdownToggle.addEventListener('click', function(event) {
-            event.stopPropagation();
-            dropdownMenu.classList.toggle('show');
-        });
-
-        // Закрытие dropdown, если клик вне его области
-        window.addEventListener('click', function(event) {
-            if (!dropdown.contains(event.target)) {
-                dropdownMenu.classList.remove('show');
-            }
-        });
-    });
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     var dropdown = document.querySelector('.dropdown');
+    //     var dropdownToggle = dropdown.querySelector('.dropdown-toggle');
+    //     var dropdownMenu = dropdown.querySelector('.dropdown-menu');
+    //
+    //     dropdownToggle.addEventListener('click', function(event) {
+    //         event.stopPropagation();
+    //         dropdownMenu.classList.toggle('show');
+    //     });
+    //
+    //     // Закрытие dropdown, если клик вне его области
+    //     window.addEventListener('click', function(event) {
+    //         if (!dropdown.contains(event.target)) {
+    //             dropdownMenu.classList.remove('show');
+    //         }
+    //     });
+    // });
 
 </script>
 </html>
