@@ -77,7 +77,17 @@ class SlideController extends Controller
     }
 
     public function remove($courseId, $slideId) {
-        $slide = Slide::where('course_id', $courseId)->where('slide_number', $slideId)->delete();
-        return redirect()->back();
+
+        Slide::where('course_id', $courseId)->where('slide_number', $slideId)->delete();
+        $previousSlide = Slide::where('course_id', $courseId)
+            ->where('slide_number', '<', $slideId)
+            ->orderBy('slide_number', 'desc')
+            ->first();
+
+        if ($previousSlide) {
+            return redirect()->to('/courses/' . $courseId . '/slide/' . $previousSlide->slide_number);
+        }
+
+        return redirect()->route('course.slideList', ['course' => $courseId]);
     }
 }
