@@ -88,6 +88,6 @@ class SlideController extends Controller
             return redirect()->to('/courses/' . $courseId . '/slide/' . $previousSlide->slide_number);
         }
 
-        return redirect()->route('course.slideList', ['course' => $courseId]);
+        return redirect()->back();
     }
 }
