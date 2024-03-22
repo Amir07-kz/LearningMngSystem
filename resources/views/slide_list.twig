@@ -114,7 +114,7 @@
                     <li class="lesson-item">
                         <a href="/courses/{{ courseId }}/slide/{{ slideItem.slide_number }}">
                             <span class="lesson-title">{{ slideItem.title }}</span>{{ slideItem.slide_number }}
-                            <form action="{{ route('slide.remove', {'course': courseId, 'slide': slide.slide_number}) }}" method="post">
+                            <form action="{{ route('slide.remove', {'course': courseId, 'slide': slideItem.slide_number}) }}" method="post">
                                 {{ csrf_field() }}
                                 <button class="icon-duplicate">Delete</button>
                                 <input type="hidden" name="_method" value="DELETE">
