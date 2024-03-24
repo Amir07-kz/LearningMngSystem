@@ -22,7 +22,6 @@ return new class extends Migration
             $slide->save();
         });
 
-        // Шаг 3: Изменить столбец на NOT NULL
         Schema::table('slides', function (Blueprint $table) {
             $table->integer('slide_number')->nullable(false)->change();
         });
