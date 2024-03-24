@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class Slide extends Model
 {
-    protected $fillable = ['course_id', 'title', 'description', 'subtitle', 'button_text', 'audio_path', 'has_exit_button'];
+    protected $fillable = ['id', 'course_id', 'title', 'description', 'created_at', 'updated_at', 'slide_number'];
 
     public function course()
     {

@@ -61,7 +61,6 @@ class SlideController extends Controller
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'position' => 'required|integer',
         ]);
 
         $slide = Slide::where('course_id', $courseId)->where('slide_number', $slideId)->first();
@@ -69,7 +68,6 @@ class SlideController extends Controller
         if ($slide) {
             $slide->title = $validatedData['title'];
             $slide->description = $validatedData['description'];
-            $slide->position = $validatedData['position'];
             $slide->save();
         }
 
