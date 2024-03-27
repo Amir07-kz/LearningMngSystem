@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Slide;
+use App\Models\SlideDescription;
 use Illuminate\Http\Request;
 
 class SlideController extends Controller
@@ -32,8 +33,15 @@ class SlideController extends Controller
     }
     public function show($courseId, $slideNumber)
     {
-        $slide = Slide::where('course_id', $courseId)->where('slide_number', $slideNumber)->firstOrFail();
-        $slides = Slide::where('course_id', $courseId)->orderBy('slide_number')->get();
+        $slide = Slide::with('descriptions')
+            ->where('course_id', $courseId)
+            ->where('slide_number', $slideNumber)
+            ->firstOrFail();
+
+        $slides = Slide::where('course_id', $courseId)
+            ->orderBy('slide_number')
+            ->get();
+
         return view('slides_show', [
             'slide' => $slide,
             'slides' => $slides,
@@ -56,36 +64,36 @@ class SlideController extends Controller
         return redirect()->back();
     }
 
-    public function update(Request $request, $courseId, $slideId) {
-
+    public function update(Request $request, $courseId, $slideId)
+    {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
+            'new_description.*' => 'required|string|max:255',
+            'descriptions.*' => 'required|string|max:255',
         ]);
 
-        $slide = Slide::where('course_id', $courseId)->where('slide_number', $slideId)->first();
+        $slide = Slide::with('descriptions')->where('course_id', $courseId)->where('slide_number', $slideId)->firstOrFail();
+        $slide->title = $validatedData['title'];
 
-        if ($slide) {
-            $slide->title = $validatedData['title'];
-            $slide->description = $validatedData['description'];
-            $slide->save();
+        if (isset($validatedData['descriptions'])) {
+            foreach ($validatedData['descriptions'] as $descriptionId => $descriptionText) {
+                $description = SlideDescription::find($descriptionId);
+                if ($description) {
+                    $description->description = $descriptionText;
+                    $description->save();
+                }
+            }
         }
 
-        return redirect()->back();
-    }
-
-    public function remove($courseId, $slideId) {
-
-        Slide::where('course_id', $courseId)->where('slide_number', $slideId)->delete();
-        $previousSlide = Slide::where('course_id', $courseId)
-            ->where('slide_number', '<', $slideId)
-            ->orderBy('slide_number', 'desc')
-            ->first();
-
-        if ($previousSlide) {
-            return redirect()->to('/courses/' . $courseId . '/slide/' . $previousSlide->slide_number);
+        if (isset($validatedData['new_description'])) {
+            foreach ($validatedData['new_description'] as $descriptionText) {
+                if (!empty($descriptionText)) {
+                    $slide->descriptions()->create(['description' => $descriptionText]);
+                }
+            }
         }
 
+        $slide->save();
         return redirect()->back();
     }
 }
