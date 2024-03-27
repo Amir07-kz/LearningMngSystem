@@ -14,4 +14,9 @@ class Slide extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
+    public function descriptions()
+    {
+        return $this->hasMany(SlideDescription::class);
+    }
 }
