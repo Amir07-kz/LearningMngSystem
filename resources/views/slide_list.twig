@@ -72,12 +72,18 @@
         }
 
         .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             background-color: #fefefe;
-            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 50%;
             box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            width: 300px;
+            height: auto;
+            max-width: 600px;
+            max-height: 90vh;
         }
 
         .content {
