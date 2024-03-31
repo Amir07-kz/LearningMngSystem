@@ -111,4 +111,8 @@ class SlideController extends Controller
 
         return redirect()->route('course.slideList', ['course' => $courseId]);
     }
+
+    public function slideContentRemove($description){
+        dd($description);
+    }
 }

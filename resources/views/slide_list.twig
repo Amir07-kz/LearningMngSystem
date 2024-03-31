@@ -104,6 +104,23 @@
             display: block;
         }
 
+        .content-actions {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+        }
+
+        .content-actions button {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .content-actions button:hover {
+            background: #f0f0f0;
+        }
+
     </style>
 </head>
 <body>
@@ -152,16 +169,27 @@
                 </div>
                 <div id="textContainer">
                     <div>
-                        <label for="description">Slide Text:</label>
                         {% for description in slide.descriptions %}
                             <div>
                                 <label for="description_{{ description.id }}">Text:</label>
-                                <textarea id="description_{{ description.id }}" name="descriptions[{{ description.id }}]">{{ description.description }}</textarea>
+                                <form action="{{ route('slide.content.remove', {'course': courseId, 'slide': slide.slide_number, 'descriptionId': description.id}) }}" method="post">
+                                    {{ csrf_field() }}
+                                    <textarea id="description_{{ description.id }}" name="descriptions[{{ description.id }}]">{{ description.description }}</textarea>
+                                    <button type="submit" class="icon-duplicate">Delete</button>
+                                    <input type="hidden" name="_method" value="DELETE">
+                                </form>
                             </div>
                         {% endfor %}
                     </div>
+                    <button type="button" id="addSectionButton">+ Add New Section</button>
+                    <div class="content-actions" id="contentActions" style="display: none;">
+                        <button type="button" id="addTextButton">Text</button>
+                        <button type="button" id="addImageButton">Img</button>
+                        <button type="button" id="addVideoButton">Video</button>
+                        <button type="button" id="addQuizButton">Quiz</button>
+                    </div>
+                    <div id="sectionContainer"></div>
                 </div>
-                <button type="button" id="addTextButton">Add New Text</button>
                 <div>
                     <label for="audio">Slide Audio (optional):</label>
                     <input type="file" id="audio" name="audio" accept=".mp3, .wav">
@@ -213,13 +241,51 @@
             newTextArea.classList.add('additional-description');
 
             var newLabel = document.createElement('label');
-            newLabel.textContent = 'Additional Text:';
+            newLabel.textContent = 'Content : ';
 
             var newDiv = document.createElement('div');
             newDiv.appendChild(newLabel);
             newDiv.appendChild(newTextArea);
 
             container.appendChild(newDiv);
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('addText').addEventListener('click', addTextField);
+        document.getElementById('addImage').addEventListener('click', addImageField);
+        document.getElementById('addVideo').addEventListener('click', addVideoField);
+        document.getElementById('addQuiz').addEventListener('click', addQuizField);
+    });
+
+    function addTextField() {
+        var container = document.getElementById('textContainer');
+        var newTextArea = document.createElement('textarea');
+        newTextArea.name = 'new_description[]';
+        container.appendChild(newTextArea);
+    }
+
+    function addImageField() {
+        var container = document.getElementById('textContainer');
+        var newInput = document.createElement('input');
+        newInput.type = 'file';
+        newInput.name = 'new_image[]';
+        newInput.accept = 'image/*';
+        container.appendChild(newInput);
+    }
+
+    function addVideoField() {
+    }
+
+    function addQuizField() {
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var addSectionButton = document.getElementById('addSectionButton');
+        var contentActions = document.getElementById('contentActions');
+
+        addSectionButton.addEventListener('click', function () {
+            contentActions.style.display = contentActions.style.display === 'none' ? 'block' : 'none';
         });
     });
 </script>

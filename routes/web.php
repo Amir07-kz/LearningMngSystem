@@ -48,3 +48,5 @@ Route::get('/courses/{course}/slide/{slide}', [SlideController::class, 'show'])-
 Route::delete('/courses/{course}/slide/{slide}', [SlideController::class, 'remove'])->name('slide.remove');
 
 Route::post('/courses/{course}/slide/{slide}', [SlideController::class, 'update'])->name('slide.update');
+
+Route::delete('/courses/{course}/slide/{slide}/description/{descriptionId}', [SlideController::class, 'slideContentRemove'])->name('slide.content.remove');
