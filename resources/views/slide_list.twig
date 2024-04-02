@@ -121,6 +121,17 @@
             background: #f0f0f0;
         }
 
+        #imagePreviewContainer {
+            display: none;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        #imagePreview {
+            width: 40%;
+            height: auto;
+        }
+
     </style>
 </head>
 <body>
@@ -191,8 +202,11 @@
                     <div id="sectionContainer"></div>
                 </div>
                 <div>
-                    <label for="audio">Slide Audio (optional):</label>
-                    <input type="file" id="audio" name="audio" accept=".mp3, .wav">
+                    <label style="display: none" for="imageUpload">Upload Image:</label>
+                    <input style="display: none" type="file" id="imageUpload" name="image" accept="image/*" onchange="previewImage(this);">
+                    <div id="imagePreviewContainer">
+                        <img id="imagePreview" src="" alt="Image Preview">
+                    </div>
                 </div>
                 <button type="submit">Update Slide</button>
             </form>
@@ -288,5 +302,30 @@
             contentActions.style.display = contentActions.style.display === 'none' ? 'block' : 'none';
         });
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('addImageButton').addEventListener('click', function() {
+            document.getElementById('imageUpload').click();
+        });
+    });
+
+    function previewImage(input) {
+        var previewContainer = document.getElementById('imagePreviewContainer');
+        var previewImage = document.getElementById('imagePreview');
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewContainer.style.display = 'block';
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            previewContainer.style.display = 'none';
+            previewImage.src = '';
+        }
+    }
 </script>
 </html>
