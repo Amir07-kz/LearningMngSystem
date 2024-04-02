@@ -6,13 +6,8 @@ use App\Models\Slide;
 use App\Models\SlideDescription;
 use Illuminate\Http\Request;
 
-class SlideController extends Controller
+class SlideController
 {
-//    public function index($courseId)
-//    {
-//        $slides = Slide::where('course_id', $courseId)->orderBy('slide_number')->get();
-//        return view('slide_list', ['courseId' => $courseId, 'slides' => $slides]);
-//    }
     public function index($courseId)
     {
         $slides = Slide::where('course_id', $courseId)->orderBy('slide_number')->get();
@@ -65,6 +60,7 @@ class SlideController extends Controller
 
     public function update(Request $request, $courseId, $slideId)
     {
+        dd($request);
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'new_description.*' => 'required|string|max:255',
