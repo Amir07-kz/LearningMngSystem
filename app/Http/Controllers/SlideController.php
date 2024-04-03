@@ -60,7 +60,7 @@ class SlideController
 
     public function update(Request $request, $courseId, $slideId)
     {
-        dd($request);
+//        dd($request->all());
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'new_description.*' => 'required|string|max:255',
@@ -108,7 +108,11 @@ class SlideController
         return redirect()->route('course.slideList', ['course' => $courseId]);
     }
 
-    public function slideContentRemove($description){
-        dd($description);
+    public function slideContentRemove($courseId, $slideId, $descriptionId) {
+        $description = SlideDescription::find($descriptionId);
+        if ($description) {
+            $description->delete();
+        }
+        return redirect()->back();
     }
 }
