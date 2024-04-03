@@ -179,27 +179,19 @@
                     <input type="text" id="title" name="title" required value="{{ slide.title }}">
                 </div>
                 <div id="textContainer">
-                    <div>
-                        {% for description in slide.descriptions %}
-                            <div>
-                                <label for="description_{{ description.id }}">Text:</label>
-                                <form action="{{ route('slide.content.remove', {'course': courseId, 'slide': slide.slide_number, 'descriptionId': description.id}) }}" method="post">
-                                    {{ csrf_field() }}
-                                    <textarea id="description_{{ description.id }}" name="descriptions[{{ description.id }}]">{{ description.description }}</textarea>
-                                    <button type="submit" class="icon-duplicate">Delete</button>
-                                    <input type="hidden" name="_method" value="DELETE">
-                                </form>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <button type="button" id="addSectionButton">+ Add New Section</button>
-                    <div class="content-actions" id="contentActions" style="display: none;">
-                        <button type="button" id="addTextButton">Text</button>
-                        <button type="button" id="addImageButton">Img</button>
-                        <button type="button" id="addVideoButton">Video</button>
-                        <button type="button" id="addQuizButton">Quiz</button>
-                    </div>
-                    <div id="sectionContainer"></div>
+                    {% for description in slide.descriptions %}
+                        <div>
+                            <label for="description_{{ description.id }}">Text:</label>
+                            <textarea id="description_{{ description.id }}" name="descriptions[{{ description.id }}]">{{ description.description }}</textarea>
+                            <button type="button" class="delete-button" data-description-id="{{ description.id }}">Delete</button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" id="addSectionButton">+ Add New Section</button>
+                <div id="sectionContainer"></div>
+                <div class="content-actions" id="contentActions" style="display: none;">
+                    <button type="button" id="addTextButton">Text</button>
+                    <button type="button" id="addImageButton">Img</button>
                 </div>
                 <div>
                     <label style="display: none" for="imageUpload">Upload Image:</label>
@@ -210,6 +202,12 @@
                 </div>
                 <button type="submit">Update Slide</button>
             </form>
+            {% for description in slide.descriptions %}
+                <form action="{{ route('slide.content.remove', {'course': courseId, 'slide': slide.slide_number, 'descriptionId': description.id}) }}" method="post" style="display: none;">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="_method" value="DELETE">
+                </form>
+            {% endfor %}
         </div>
     </div>
 </div>
@@ -270,6 +268,22 @@
         document.getElementById('addImage').addEventListener('click', addImageField);
         document.getElementById('addVideo').addEventListener('click', addVideoField);
         document.getElementById('addQuiz').addEventListener('click', addQuizField);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var deleteButtons = document.querySelectorAll('.delete-button');
+
+        deleteButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var descriptionId = button.getAttribute('data-description-id');
+                var deleteForm = document.querySelector('form[action*="' + descriptionId + '"]');
+                if (deleteForm) {
+                    deleteForm.submit();
+                } else {
+                    console.error('Delete form not found');
+                }
+            });
+        });
     });
 
     function addTextField() {
