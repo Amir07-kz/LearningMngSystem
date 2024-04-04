@@ -50,3 +50,5 @@ Route::delete('/courses/{course}/slide/{slide}', [SlideController::class, 'remov
 Route::post('/courses/{course}/slide/{slide}', [SlideController::class, 'update'])->name('slide.update');
 
 Route::delete('/courses/{course}/slide/{slide}/description/{descriptionId}', [SlideController::class, 'slideContentRemove'])->name('slide.content.remove');
+
+Route::delete('/media/delete/{id}', [SlideController::class, 'deleteMedia'])->name('media.delete');

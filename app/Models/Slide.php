@@ -19,4 +19,9 @@ class Slide extends Model
     {
         return $this->hasMany(SlideDescription::class);
     }
+
+    public function mediaFiles()
+    {
+        return $this->hasMany(MediaFile::class, 'related_id');
+    }
 }

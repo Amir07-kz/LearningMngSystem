@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MediaFile;
 use App\Models\Slide;
 use App\Models\SlideDescription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SlideController
 {
@@ -28,7 +30,7 @@ class SlideController
     }
     public function show($courseId, $slideNumber)
     {
-        $slide = Slide::with('descriptions')
+        $slide = Slide::with('descriptions', 'mediaFiles')
             ->where('course_id', $courseId)
             ->where('slide_number', $slideNumber)
             ->firstOrFail();
@@ -60,15 +62,26 @@ class SlideController
 
     public function update(Request $request, $courseId, $slideId)
     {
-//        dd($request->all());
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'new_description.*' => 'required|string|max:255',
+            'new_description.*' => 'nullable|string|max:255',
             'descriptions.*' => 'required|string|max:255',
         ]);
 
         $slide = Slide::with('descriptions')->where('course_id', $courseId)->where('slide_number', $slideId)->firstOrFail();
         $slide->title = $validatedData['title'];
+
+        if ($request->hasFile('image')) {
+            $mediaFile = $request->file('image');
+            $filePath = $mediaFile->store('image', 'public');
+            $fileType = $mediaFile->getMimeType();
+
+            MediaFile::create([
+                'related_id' => $slide->id,
+                'file_path'  => $filePath,
+                'file_type'  => $fileType
+            ]);
+        }
 
         if (isset($validatedData['descriptions'])) {
             foreach ($validatedData['descriptions'] as $descriptionId => $descriptionText) {
@@ -114,5 +127,13 @@ class SlideController
             $description->delete();
         }
         return redirect()->back();
+    }
+
+    public function deleteMedia($id)
+    {
+        $mediaFile = MediaFile::findOrFail($id);
+        Storage::disk('public')->delete($mediaFile->file_path);
+        $mediaFile->delete();
+        return response()->json(['success' => true]);
     }
 }
