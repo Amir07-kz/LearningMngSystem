@@ -138,6 +138,10 @@
             height: 40%;
             object-fit: cover;
         }
+        .image-container {
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -162,11 +166,11 @@
                         </a>
                     </li>
                 {% endfor %}
-                    <div class="dropdown">
-                        <div class="dropdown-menu">
-                            <button class="dropdown-toggle">+</button>
-                        </div>
+                <div class="dropdown">
+                    <div class="dropdown-menu">
+                        <button class="dropdown-toggle">+</button>
                     </div>
+                </div>
                 <li class="lesson-item">
                     <a class="add_slide">+</a>
                 </li>
@@ -192,12 +196,37 @@
                             <button type="button" class="delete-button" data-description-id="{{ description.id }}">Delete</button>
                         </div>
                     {% endfor %}
+                    {% for mediaFile in slide.mediaFiles %}
+                        {% if mediaFile.file_type starts with 'image' %}
+                            <div class="image-container">
+                                <img class="slide-image" src="{{ asset('storage/' ~ mediaFile.file_path) }}" alt="Media Image">
+                                <button type="button" class="delete-media-button" data-id="{{ mediaFile.id }}">Delete</button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    <div class="quiz-section">
+                        {% for question in slide.questions %}
+                            <div class="question">
+                                <input type="text" name="questions[{{ question.id }}][text]" value="{{ question.text }}">
+                                <button type="button" class="delete-question">Delete Question</button>
+                                {% for answer in question.answers %}
+                                    <div class="answer">
+                                        <input type="text" name="questions[{{ question.id }}][answers][{{ answer.id }}][text]" value="{{ answer.text }}">
+                                        <input type="checkbox" name="questions[{{ question.id }}][answers][{{ answer.id }}][is_correct]" {% if answer.is_correct %} checked {% endif %}>
+                                        <button type="button" class="delete-answer">Delete Answer</button>
+                                    </div>
+                                {% endfor %}
+                                <button type="button" onclick="addAnswer(this)">Add answer</button>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
                 <button type="button" id="addSectionButton">+ Add New Section</button>
                 <div id="sectionContainer"></div>
                 <div class="content-actions" id="contentActions" style="display: none;">
                     <button type="button" id="addTextButton">Text</button>
                     <button type="button" id="addImageButton">Img</button>
+                    <button type="button" id="addTestButton">Test</button>
                 </div>
                 <div>
                     <label style="display: none" for="imageUpload">Upload Image:</label>
@@ -205,6 +234,24 @@
                     <div id="imagePreviewContainer">
                         <img id="imagePreview" src="" alt="Image Preview">
                     </div>
+                </div>
+                <div class="quiz-add-section" style="display: none;">
+                    <h2>Create a Quiz Question</h2>
+                    <div>
+                        <label for="question">Question:</label>
+                        <input type="text" id="question" name="question_text">
+                    </div>
+                    <div class="answers">
+                        {% for answer in question.answers %}
+                            <div class="answer">
+                                <input type="text" name="answers[{{ question.id }}][{{ answer.id }}][text]" value="{{ answer.text }}">
+                                <input type="checkbox" name="correct_answers[{{ question.id }}][{{ answer.id }}]"
+                                       value="{{ answer.id }}" {% if answer.is_correct %} checked {% endif %}>
+                                Mark as correct
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" id="addAnswerButton">Add Answers</button>
                 </div>
                 <button type="submit">Update Slide</button>
             </form>
@@ -214,19 +261,73 @@
                     <input type="hidden" name="_method" value="DELETE">
                 </form>
             {% endfor %}
-            {% for mediaFile in slide.mediaFiles %}
-                {% if mediaFile.file_type starts with 'image' %}
-                    <div>
-                        <img class="slide-image" src="{{ asset('storage/' ~ mediaFile.file_path) }}" alt="Media Image">
-                        <button type="button" class="delete-media-button" data-id="{{ mediaFile.id }}">Delete</button>
-                    </div>
-                {% endif %}
-            {% endfor %}
         </div>
     </div>
 </div>
 </body>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var addQuizButton = document.getElementById('addTestButton');
+        console.log(addQuizButton)
+        var quizSection = document.querySelector('.quiz-add-section');
+
+        if (addQuizButton && quizSection) {
+            addQuizButton.addEventListener('click', function() {
+                quizSection.style.display = quizSection.style.display === 'none' ? 'block' : 'none';
+            });
+        } else {
+            console.error('Element not found');
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.addEventListener('click', function(event) {
+            if (event.target.classList.contains('delete-answer')) {
+                const answerDiv = event.target.closest('.answer');
+                if (answerDiv) {
+                    answerDiv.remove();
+                }
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.addEventListener('click', function(event) {
+            if (event.target.classList.contains('delete-question')) {
+                const questionDiv = event.target.closest('.question');
+                if (questionDiv) {
+                    questionDiv.remove();
+                }
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var addAnswerBtn = document.getElementById('addAnswerButton');
+        var answersDiv = document.querySelector('.answers');
+
+        addAnswerBtn.addEventListener('click', function() {
+            var newAnswer = document.createElement('div');
+            newAnswer.classList.add('answer');
+
+            var answerInput = document.createElement('input');
+            answerInput.type = 'text';
+            answerInput.name = 'answers[]';
+            answerInput.placeholder = 'Answer';
+
+            var correctAnswerCheckbox = document.createElement('input');
+            correctAnswerCheckbox.type = 'checkbox';
+            correctAnswerCheckbox.name = 'correct_answers[]';
+            correctAnswerCheckbox.value = answersDiv.children.length;
+
+            newAnswer.appendChild(answerInput);
+            newAnswer.appendChild(correctAnswerCheckbox);
+            newAnswer.appendChild(document.createTextNode(' Mark as correct'));
+
+            answersDiv.appendChild(newAnswer);
+        });
+    });
+
     document.addEventListener("DOMContentLoaded", function() {
         var addSlideButton = document.querySelector('.add_slide');
         if (addSlideButton) {
@@ -255,8 +356,7 @@
             });
         }
     });
-</script>
-<script>
+
     document.addEventListener('DOMContentLoaded', function() {
         const deleteButtons = document.querySelectorAll('.delete-media-button');
 

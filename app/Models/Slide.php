@@ -24,4 +24,9 @@ class Slide extends Model
     {
         return $this->hasMany(MediaFile::class, 'related_id');
     }
+
+    public function questions()
+    {
+        return $this->hasMany(Question::class);
+    }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use App\Models\MediaFile;
+use App\Models\Question;
 use App\Models\Slide;
 use App\Models\SlideDescription;
 use Illuminate\Http\Request;
@@ -30,7 +32,7 @@ class SlideController
     }
     public function show($courseId, $slideNumber)
     {
-        $slide = Slide::with('descriptions', 'mediaFiles')
+        $slide = Slide::with(['descriptions', 'mediaFiles', 'questions.answers'])
             ->where('course_id', $courseId)
             ->where('slide_number', $slideNumber)
             ->firstOrFail();
@@ -64,12 +66,61 @@ class SlideController
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'new_description.*' => 'nullable|string|max:255',
-            'descriptions.*' => 'required|string|max:255',
+            'new_description.*' => 'nullable',      // изменил длину текстов
+            'descriptions.*' => 'required',
+            'question_text' => 'nullable|max:255',
+            'answers.*' => 'nullable|string|max:255',
+            'correct_answers.*' => 'nullable',
+
         ]);
+//        dd($request->all());
 
         $slide = Slide::with('descriptions')->where('course_id', $courseId)->where('slide_number', $slideId)->firstOrFail();
         $slide->title = $validatedData['title'];
+
+        if ($request->filled('question_text')) {
+            $question = new Question([
+                'text' => $validatedData['question_text']
+            ]);
+
+            $slide->questions()->save($question);
+
+            if ($request->has('answers')) {
+                $answers = $request->input('answers');
+                $correctAnswers = $request->input('correct_answers', []);
+                foreach ($answers as $index => $answerText) {
+                    if (!empty($answerText)) {
+                        $answer = new Answer([
+                            'text' => $answerText,
+                            'is_correct' => in_array($index + 1, $correctAnswers),
+                        ]);
+
+                        $question->answers()->save($answer);
+                    }
+                }
+            }
+        }
+
+//        if (isset($validatedData['questions'])) {
+//            foreach ($validatedData['questions'] as $questionId => $questionData) {
+//                $question = Question::find($questionId);
+//                if ($question) {
+//                    $question->text = $questionData['text'];
+//                    $question->save();
+//
+//                    if (isset($questionData['answers'])) {
+//                        foreach ($questionData['answers'] as $answerId => $answerData) {
+//                            $answer = Answer::find($answerId);
+//                            if ($answer) {
+//                                $answer->text = $answerData['text'];
+//                                $answer->is_correct = isset($answerData['is_correct']);
+//                                $answer->save();
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         if ($request->hasFile('image')) {
             $mediaFile = $request->file('image');
