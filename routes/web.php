@@ -17,11 +17,11 @@ use App\Http\Controllers\SlideController;
 | be assigned to the "web" middleware group. Make something great!
 */
 
-Route::get('/registration', [RegistrationController::class, 'index']);
+Route::get('/registration', [RegistrationController::class, 'index'])->name('registration');
 
 Route::post('/registration', [RegistrationController::class, 'store']);
 
-Route::get('/login', [LoginController::class, 'index']);
+Route::get('/login', [LoginController::class, 'index'])->name('login');
 
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 
@@ -29,7 +29,11 @@ Route::get('/', [HomeController::class, 'index'])->name('/');
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/courses/create', [CourseController::class, 'index']);
+Route::post('/courses/join', [CourseController::class, 'joinToCourse'])->name('join_course');
+
+Route::get('/my-courses', [CourseController::class, 'myCourses'])->name('my_courses');
+
+Route::get('/courses/create', [CourseController::class, 'index'])->name('create_course');
 
 Route::post('/courses/create', [CourseController::class, 'store']);
 
