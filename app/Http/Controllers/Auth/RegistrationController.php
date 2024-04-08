@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\View; // Добавлен фасад View
 
 class RegistrationController extends Controller // Исправлено наследование
 {
@@ -28,6 +27,6 @@ class RegistrationController extends Controller // Исправлено наследование
         $user->password = Hash::make($request->password);
         $user->save();
 
-        return redirect()->back()->with('success', 'User registered successfully'); // Уведомить пользователя и на страницу авторизации
+        return redirect('/');
     }
 }

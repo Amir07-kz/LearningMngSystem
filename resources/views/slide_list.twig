@@ -182,6 +182,7 @@
         </div>
         <div class="content">
             <br>
+            {% if slide is defined %}
             <form action="{{ route('slide.update', {'course': courseId, 'slide': slide.slide_number}) }}" method="post" enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <div>
@@ -255,6 +256,7 @@
                 </div>
                 <button type="submit">Update Slide</button>
             </form>
+            {% endif %}
             {% for description in slide.descriptions %}
                 <form action="{{ route('slide.content.remove', {'course': courseId, 'slide': slide.slide_number, 'descriptionId': description.id}) }}" method="post" style="display: none;">
                     {{ csrf_field() }}

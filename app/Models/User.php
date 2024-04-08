@@ -42,4 +42,17 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function courses()
+    {
+        return $this->hasMany(Course::class, 'creator_id');
+    }
+
+    public function joinedCourses() {
+        return $this->belongsToMany(Course::class)->withTimestamps();
+    }
+
+    public function isAdmin() {
+        return $this->role == 'admin';
+    }
 }
