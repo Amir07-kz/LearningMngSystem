@@ -1,11 +1,12 @@
 <?php
 
-use App\Http\Controllers\Auth\RegistrationController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegistrationController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SlideController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,8 @@ use App\Http\Controllers\SlideController;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
 */
+
+Route::post('/api/send-request', [ApiController::class, 'sendRequest'])->name('api.sendRequest');
 
 Route::get('/registration', [RegistrationController::class, 'index'])->name('registration');
 
