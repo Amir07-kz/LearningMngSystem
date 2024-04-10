@@ -276,23 +276,23 @@
 </head>
 <body>
 <header class="header">
-    <a href="#" class="logo">Developer</a>
+    <a href="#" class="logo">yourImprove</a>
     <nav class="nav-items">
-        <a href="{{ route('/') }}">Home</a>
-        <a href="#">About</a>
+        <a href="{{ route('/') }}">Домой</a>
+        <a href="#">О нас</a>
         {% if isAdmin %}
-            <a href="{{ route('create_course') }}">Create Course</a>
+            <a href="{{ route('create_course') }}">Создать курс</a>
         {% else %}
-            <a href="javascript:void(0);" onclick="document.getElementById('joinCourseModal').style.display='block'">Join to Course</a>
+            <a href="javascript:void(0);" onclick="document.getElementById('joinCourseModal').style.display='block'">Присоединиться к курсу</a>
         {% endif %}
         {% if is_authenticated %}
 {#            <a href="{{ route('account') }}">Account</a>#}
             <form action="{{ route('logout') }}" method="POST">
                 {{ csrf_field() }}
-                <button type="submit" style="background:none; border:none; color:#af0000; padding: 35px 20px; cursor:pointer;">Exit</button>
+                <button type="submit" style="background:none; border:none; color:#af0000; padding: 35px 20px; cursor:pointer;">Выйти</button>
             </form>
         {% else %}
-            <a href="{{ route('login') }}">Log in</a>
+            <a href="{{ route('login') }}">Войти</a>
         {% endif %}
     </nav>
 </header>
@@ -301,27 +301,27 @@
     <div class="modal" id="joinCourseModal">
         <div class="modal-content">
             <span class="close-button">x</span>
-            <h2>Join to course</h2>
+            <h2>Присоединится к курсу</h2>
             <form action="{{ route('join_course') }}" method="post">
                 {{ csrf_field() }}
                 <input type="text" name="course_code" placeholder="code ">
-                <button type="submit">submit</button>
+                <button type="submit">отправить</button>
             </form>
         </div>
     </div>
 
     {% if isAdmin %}
-        <h2>Created Courses</h2>
+        <h2>Созданные курсы</h2>
         <div class="course-list">
             {% for course in courses %}
                 <div class="course-card">
                     <div class="container">
                         <h4 class="course-title"><b>{{ course.title }}</b></h4>
                         <p class="course-description">{{ course.description }}</p>
-                        <button onclick="showJoinCode('join-code-{{ course.id }}')">Show Join Code</button>
+                        <button onclick="showJoinCode('join-code-{{ course.id }}')">Код присоединения</button>
                         <p id="join-code-{{ course.id }}" class="join-code" style="display: none;">{{ course.join_code }}</p>
-                        <p class="course-duration">{{ course.duration }} hours</p>
-                        <a href="{{ url('/courses/' ~ course.id ~ '/slide/') }}">Edit slide</a>
+                        <p class="course-duration">{{ course.duration }} часов</p>
+                        <a href="{{ url('/courses/' ~ course.id ~ '/slide/') }}">Изменить слайд</a>
                     </div>
                 </div>
             {% else %}
@@ -329,7 +329,7 @@
             {% endfor %}
         </div>
     {% else %}
-        <h2>Joined Courses</h2>
+        <h2>Добавленые курсы</h2>
         <div class="course-list">
             {% for course in joinedCourses %}
                 <div class="course-card">
@@ -337,11 +337,10 @@
                         <h4 class="course-title"><b>{{ course.title }}</b></h4>
                         <p class="course-description">{{ course.description }}</p>
                         <p class="course-duration">{{ course.duration }} hours</p>
-                        <!-- Ссылка на просмотр или участие в курсе -->
                     </div>
                 </div>
             {% else %}
-                <p>You have not joined any courses yet.</p>
+                <p>Вы еще не добавил не один курс</p>
             {% endfor %}
         </div>
     {% endif %}
@@ -411,10 +410,7 @@
 <script>
     var modal = document.getElementById('joinCourseModal');
 
-    // Получаем элемент <span>, который закрывает модальное окно
     var span = document.getElementsByClassName("close-button")[0];
-
-    // Когда пользователь кликает на <span> (x), закрываем модальное окно
     span.onclick = function() {
         modal.style.display = "none";
     }

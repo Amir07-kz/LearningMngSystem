@@ -20,20 +20,20 @@ class CourseController extends Controller
         $isAdmin = $user->isAdmin();
         $createdCourses = $user->courses()->get();
         $joinedCourses = $user->joinedCourses()->get();
-        $isAuthenticated = Auth::check(); // Проверка аутентификации пользователя
+        $isAuthenticated = Auth::check();
 
         return view('courses_list', [
             'courses' => $createdCourses,
             'joinedCourses' => $joinedCourses,
             'isAdmin' => $isAdmin,
-            'is_authenticated' => $isAuthenticated // Убедитесь, что передаёте это в ваше представление
+            'is_authenticated' => $isAuthenticated
         ]);
     }
 
     public function myCourses()
     {
         $user = Auth::user();
-        $joinedCourses = $user->joinedCourses()->with('slides')->get(); // Предполагается наличие отношения slides в модели Course
+        $joinedCourses = $user->joinedCourses()->with('slides')->get();
         return view('my_courses', compact('joinedCourses'));
     }
 
@@ -43,9 +43,9 @@ class CourseController extends Controller
 
         if ($course) {
             Auth::user()->joinedCourses()->attach($course->id);
-            return back()->with('success', 'Вы успешно присоединились к курсу!');
+            return back()->with('success', 'Р’С‹ СѓСЃРїРµС€РЅРѕ РїСЂРёСЃРѕРµРґРёРЅРёР»РёСЃСЊ Рє РєСѓСЂСЃСѓ!');
         } else {
-            return back()->with('error', 'Курс с таким кодом не найден.');
+            return back()->with('error', 'РљСѓСЂСЃ СЃ С‚Р°РєРёРј РєРѕРґРѕРј РЅРµ РЅР°Р№РґРµРЅ.');
         }
     }
 
@@ -64,7 +64,7 @@ class CourseController extends Controller
         $course->join_code = Str::random(10);
         $course->save();
 
-        return redirect()->route('courses_list')->with('success', 'Курс успешно создан');
+        return redirect()->route('courses_list')->with('success', 'РљСѓСЂСЃ СѓСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅ');
     }
 
     public function create($courseId)

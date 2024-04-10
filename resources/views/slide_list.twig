@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Details of Slide #{{ slide.slide_number }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <style>
         .course-container {
@@ -141,6 +142,10 @@
         .image-container {
             margin-top: 10px;
         }
+        .api-response {
+            padding-left: 50%;
+            display: flex;
+        }
 
     </style>
 </head>
@@ -191,10 +196,12 @@
                 </div>
                 <div id="textContainer">
                     {% for description in slide.descriptions %}
-                        <div>
+                        <div class="api-response" id="api-response-{{ description.id }}">ds</div>
+                        <div class="description-block">
                             <label for="description_{{ description.id }}">Text:</label>
                             <textarea id="description_{{ description.id }}" name="descriptions[{{ description.id }}]">{{ description.description }}</textarea>
                             <button type="button" class="delete-button" data-description-id="{{ description.id }}">Delete</button>
+                            <button type="button" class="ai-button" data-description-id="{{ description.id }}">AI</button>
                         </div>
                     {% endfor %}
                     {% for mediaFile in slide.mediaFiles %}
@@ -268,6 +275,43 @@
 </div>
 </body>
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.ai-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const descriptionId = this.getAttribute('data-description-id');
+                const descriptionElement = document.querySelector('#description_' + descriptionId);
+                const apiResponseElement = document.querySelector('#api-response-' + descriptionId);
+                const descriptionText = descriptionElement.value;
+
+                fetch('/api/send-request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ text: descriptionText })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        if (data.text) {
+                            apiResponseElement.textContent = "AI Response: " + data.text;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        apiResponseElement.textContent = "Error: " + error.message;
+                    });
+            });
+        });
+    });
+
+
     document.addEventListener('DOMContentLoaded', function() {
         var addQuizButton = document.getElementById('addTestButton');
         console.log(addQuizButton)
