@@ -142,10 +142,18 @@
         .image-container {
             margin-top: 10px;
         }
-        .api-response {
-            padding-left: 50%;
+        .description-container {
             display: flex;
+            align-items: flex-start;
         }
+
+        .api-response {
+            margin-right: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            color: gray;
+        }
+
 
     </style>
 </head>
@@ -196,13 +204,13 @@
                 </div>
                 <div id="textContainer">
                     {% for description in slide.descriptions %}
-                        <div class="api-response" id="api-response-{{ description.id }}">ds</div>
                         <div class="description-block">
                             <label for="description_{{ description.id }}">Text:</label>
                             <textarea id="description_{{ description.id }}" name="descriptions[{{ description.id }}]">{{ description.description }}</textarea>
                             <button type="button" class="delete-button" data-description-id="{{ description.id }}">Delete</button>
                             <button type="button" class="ai-button" data-description-id="{{ description.id }}">AI</button>
                         </div>
+                        <div class="api-response" id="api-response-{{ description.id }}"></div>
                     {% endfor %}
                     {% for mediaFile in slide.mediaFiles %}
                         {% if mediaFile.file_type starts with 'image' %}
@@ -281,7 +289,8 @@
                 const descriptionId = this.getAttribute('data-description-id');
                 const descriptionElement = document.querySelector('#description_' + descriptionId);
                 const apiResponseElement = document.querySelector('#api-response-' + descriptionId);
-                const descriptionText = descriptionElement.value;
+                const promt = "Как можно улучшить этот текст \n";
+                const descriptionText = promt + descriptionElement.value;
 
                 fetch('/api/send-request', {
                     method: 'POST',
@@ -298,9 +307,9 @@
                         return response.json();
                     })
                     .then(data => {
-                        console.log(data);
+                        // console.log(data);
                         if (data.text) {
-                            apiResponseElement.textContent = "AI Response: " + data.text;
+                            apiResponseElement.textContent = data.text;
                         }
                     })
                     .catch(error => {
