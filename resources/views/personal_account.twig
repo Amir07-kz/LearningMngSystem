@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный аккаунт</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        form {
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="email"], input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<form action="{{ route('update_account') }}" method="post">
+    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    <h2 style="text-align: center;">{{ user.name }}</h2>
+    <input type="text" name="name" placeholder="Name" value="{{ user.name }}">
+    {% if errors.has('name') %}
+        <div class="error">{{ errors.first('name') }}</div>
+    {% endif %}
+    <input type="email" name="email" placeholder="Email" value="{{ user.email }}">
+    {% if errors.has('email') %}
+        <div class="error">{{ errors.first('email') }}</div>
+    {% endif %}
+    <input type="submit" value="Сохранить">
+    {% if session('success') %}
+        <div class="alert alert-success">{{ session('success') }}</div>
+    {% endif %}
+
+</form>
+</body>
+</html>

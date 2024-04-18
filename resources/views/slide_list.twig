@@ -154,6 +154,22 @@
             color: gray;
         }
 
+        .exit {
+            margin-top: 20px;
+            padding-left: 35%;
+        }
+
+        .question {
+            padding: 2.5%;
+        }
+
+        .loading {
+            color: #000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            position: relative;
+        }
 
     </style>
 </head>
@@ -161,7 +177,7 @@
 <div class="course-container">
     <div class="course-header">
         <a href="{{ route('courses_list') }}"><-</a>
-        <h1>Introduction to PHP</h1>
+        <h1>{{ slides[0].course.title }}</h1>
     </div>
     <div class="lessons-container">
         <div class="lesson-list">
@@ -171,22 +187,30 @@
                     <li class="lesson-item">
                         <a href="/courses/{{ courseId }}/slide/{{ slideItem.slide_number }}">
                             <span class="lesson-title">{{ slideItem.title }}</span>
-                            <form action="{{ route('slide.remove', {'course': courseId, 'slide': slideItem.slide_number}) }}" method="post">
-                                {{ csrf_field() }}
-                                <button class="icon-duplicate">Delete</button>
-                                <input type="hidden" name="_method" value="DELETE">
-                            </form>
+                            {% if is_admin %}
+                                <form action="{{ route('slide.remove', {'course': courseId, 'slide': slideItem.slide_number}) }}" method="post">
+                                    {{ csrf_field() }}
+                                    <button class="icon-duplicate">Delete</button>
+                                    <input type="hidden" name="_method" value="DELETE">
+                                </form>
+                            {% endif %}
                         </a>
                     </li>
                 {% endfor %}
-                <div class="dropdown">
-                    <div class="dropdown-menu">
-                        <button class="dropdown-toggle">+</button>
+                {% if is_admin %}
+                    <div class="dropdown">
+                        <div class="dropdown-menu">
+                            <button class="dropdown-toggle">+</button>
+                        </div>
                     </div>
-                </div>
-                <li class="lesson-item">
-                    <a class="add_slide">+</a>
-                </li>
+                    <li class="lesson-item">
+                        <a class="add_slide">+</a>
+                    </li>
+                {% else %}
+                    <div class="exit">
+                        <a>Завершить курс</a>
+                    </div>
+                {% endif %}
             </ul>
         </div>
         <div id="myModal" class="modal" style="display: none;">
@@ -198,7 +222,7 @@
             {% if slide is defined %}
             <form action="{{ route('slide.update', {'course': courseId, 'slide': slide.slide_number}) }}" method="post" enctype="multipart/form-data">
                 {{ csrf_field() }}
-                <div>
+                <div style="margin-top: 3%">
                     <label for="title">Slide Title:</label>
                     <input type="text" id="title" name="title" required value="{{ slide.title }}">
                 </div>
@@ -207,37 +231,51 @@
                         <div class="description-block">
                             <label for="description_{{ description.id }}">Text:</label>
                             <textarea id="description_{{ description.id }}" name="descriptions[{{ description.id }}]">{{ description.description }}</textarea>
-                            <button type="button" class="delete-button" data-description-id="{{ description.id }}">Delete</button>
+                            {% if is_admin %}
+                                <button type="button" class="delete-button" data-description-id="{{ description.id }}">Delete</button>
+                            {% endif %}
                             <button type="button" class="ai-button" data-description-id="{{ description.id }}">AI</button>
                         </div>
                         <div class="api-response" id="api-response-{{ description.id }}"></div>
-                    {% endfor %}
+                        <div id="loading-{{ description.id }}" class="loading" style="display: none;">Loading...</div>                    {% endfor %}
                     {% for mediaFile in slide.mediaFiles %}
                         {% if mediaFile.file_type starts with 'image' %}
                             <div class="image-container">
                                 <img class="slide-image" src="{{ asset('storage/' ~ mediaFile.file_path) }}" alt="Media Image">
-                                <button type="button" class="delete-media-button" data-id="{{ mediaFile.id }}">Delete</button>
+                                {% if is_admin %}
+                                    <button type="button" class="delete-media-button" data-id="{{ mediaFile.id }}">Delete</button>
+                                {% endif %}
                             </div>
                         {% endif %}
                     {% endfor %}
                     <div class="quiz-section">
                         {% for question in slide.questions %}
                             <div class="question">
-                                <input type="text" name="questions[{{ question.id }}][text]" value="{{ question.text }}">
-                                <button type="button" class="delete-question">Delete Question</button>
+                                <input type="hidden" name="questions[{{ question.id }}][id]" value="{{ question.id }}">
+                                <input class="question" type="text" name="questions[{{ question.id }}][text]" value="{{ question.text }}">
+                                {% if is_admin %}
+                                    <button type="button" class="delete-question" data-question-id="{{ question.id }}">Удалить вопрос</button>
+                                {% endif %}
                                 {% for answer in question.answers %}
-                                    <div class="answer">
+                                    <div class="answer" data-is-correct="{{ answer.is_correct }}">
                                         <input type="text" name="questions[{{ question.id }}][answers][{{ answer.id }}][text]" value="{{ answer.text }}">
-                                        <input type="checkbox" name="questions[{{ question.id }}][answers][{{ answer.id }}][is_correct]" {% if answer.is_correct %} checked {% endif %}>
-                                        <button type="button" class="delete-answer">Delete Answer</button>
+                                        <input type="checkbox" name="questions[{{ question.id }}][answers][{{ answer.id }}][is_correct]" {% if answer.is_correct %} checked {% endif %} disabled>
+                                        {% if is_admin %}
+                                            <button type="button" class="delete-answer">Удалить ответ</button>
+                                        {% endif %}
                                     </div>
                                 {% endfor %}
-                                <button type="button" onclick="addAnswer(this)">Add answer</button>
+                                <button type="button" class="show-answer">Узнать ответ</button>
+                                {% if is_admin %}
+                                    <button type="button" onclick="addAnswer(this)">Добавить ответ</button>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     </div>
                 </div>
-                <button type="button" id="addSectionButton">+ Add New Section</button>
+                {% if is_admin %}
+                    <button type="button" id="addSectionButton">+ Add New Section</button>
+                {% endif %}
                 <div id="sectionContainer"></div>
                 <div class="content-actions" id="contentActions" style="display: none;">
                     <button type="button" id="addTextButton">Text</button>
@@ -252,9 +290,10 @@
                     </div>
                 </div>
                 <div class="quiz-add-section" style="display: none;">
-                    <h2>Create a Quiz Question</h2>
+                    <h2>Создание тестового вопроса</h2>
                     <div>
-                        <label for="question">Question:</label>
+{#                        добавить категорию вопрсоа #}
+                        <label for="question">Вопрос: </label>
                         <input type="text" id="question" name="question_text">
                     </div>
                     <div class="answers">
@@ -263,13 +302,15 @@
                                 <input type="text" name="answers[{{ question.id }}][{{ answer.id }}][text]" value="{{ answer.text }}">
                                 <input type="checkbox" name="correct_answers[{{ question.id }}][{{ answer.id }}]"
                                        value="{{ answer.id }}" {% if answer.is_correct %} checked {% endif %}>
-                                Mark as correct
+                                Mark
                             </div>
                         {% endfor %}
                     </div>
-                    <button type="button" id="addAnswerButton">Add Answers</button>
+                    <button type="button" id="addAnswerButton">Добавить ответ</button>
                 </div>
-                <button type="submit">Update Slide</button>
+                {% if is_admin %}
+                    <button type="submit">Update Slide</button>
+                {% endif %}
             </form>
             {% endif %}
             {% for description in slide.descriptions %}
@@ -284,13 +325,86 @@
 </body>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const answerButtons = document.querySelectorAll('.show-answer');
+        answerButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const answers = this.parentNode.querySelectorAll('.answer');
+                answers.forEach(answer => {
+                    const isCorrect = answer.getAttribute('data-is-correct');
+                    if (isCorrect === '1') {
+                        answer.style.backgroundColor = 'lightgreen';
+                    }
+                });
+            });
+        });
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    alert('Слайд успешно обновлен');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Ошибка обновления');
+                });
+        });
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.delete-question').forEach(button => {
+            button.addEventListener('click', function() {
+                if (!confirm('Вы уверены, что хотите удалить этот вопрос?')) {
+                    return;
+                }
+
+                var questionId = this.dataset.questionId;
+
+                fetch(`/questions/${questionId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error('Ошибка при удалении вопроса.');
+                }).then(() => {
+                    this.closest('.question').remove();
+                }).catch(error => console.error('Error:', error));
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.ai-button').forEach(button => {
             button.addEventListener('click', function () {
                 const descriptionId = this.getAttribute('data-description-id');
                 const descriptionElement = document.querySelector('#description_' + descriptionId);
                 const apiResponseElement = document.querySelector('#api-response-' + descriptionId);
-                const promt = "��� ����� �������� ���� ����� \n";
+                const loadingElement = document.querySelector('#loading-' + descriptionId);
+                const promt = "Как можно улучшить этот текст \n";
                 const descriptionText = promt + descriptionElement.value;
+
+
+                loadingElement.style.display = 'inline-block';
+                apiResponseElement.textContent = '';
 
                 fetch('/api/send-request', {
                     method: 'POST',
@@ -307,14 +421,16 @@
                         return response.json();
                     })
                     .then(data => {
-                        // console.log(data);
                         if (data.text) {
                             apiResponseElement.textContent = data.text;
                         }
+
+                        loadingElement.style.display = 'none';
                     })
                     .catch(error => {
                         console.error('Error:', error);
                         apiResponseElement.textContent = "Error: " + error.message;
+                        loadingElement.style.display = 'none';
                     });
             });
         });
@@ -377,7 +493,7 @@
 
             newAnswer.appendChild(answerInput);
             newAnswer.appendChild(correctAnswerCheckbox);
-            newAnswer.appendChild(document.createTextNode(' Mark as correct'));
+            newAnswer.appendChild(document.createTextNode(' Отметить как ответ'));
 
             answersDiv.appendChild(newAnswer);
         });
@@ -425,9 +541,9 @@
                     }
                 }).then(response => {
                     if (response.ok) {
-                        window.location.reload(); // ���������� �������� ��� ���������� ������ �����������
+                        window.location.reload(); // ���������� �������� ��� ���������� ������ �����������
                     } else {
-                        alert('��������� ������ ��� �������� �����������.');
+                        alert('��������� ������ ��� �������� �����������.');
                     }
                 });
             });

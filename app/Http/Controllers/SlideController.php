@@ -8,6 +8,7 @@ use App\Models\Question;
 use App\Models\Slide;
 use App\Models\SlideDescription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class SlideController
@@ -20,18 +21,32 @@ class SlideController
 
     public function firstSlide($courseId)
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            $is_admin = $user->isAdmin();
+        } else {
+            $is_admin = false;
+        }
+
         $firstSlide = Slide::where('course_id', $courseId)
             ->orderBy('slide_number', 'asc')
             ->first();
 
         if (!$firstSlide) {
-            return view('slide_list', ['courseId' => $courseId]);
+            return view('slide_list', ['courseId' => $courseId, 'is_admin'=> $is_admin]);
         }
 
         return redirect()->to('/courses/' . $courseId . '/slide/' . $firstSlide->slide_number);
     }
     public function show($courseId, $slideNumber)
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            $is_admin = $user->isAdmin();
+        } else {
+            $is_admin = false;
+        }
+
         $slide = Slide::with(['descriptions', 'mediaFiles', 'questions.answers'])
             ->where('course_id', $courseId)
             ->where('slide_number', $slideNumber)
@@ -42,6 +57,7 @@ class SlideController
             ->get();
 
         return view('slides_show', [
+            'is_admin' => $is_admin,
             'slide' => $slide,
             'slides' => $slides,
             'courseId' => $courseId
@@ -66,7 +82,7 @@ class SlideController
     {
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'new_description.*' => 'nullable',      // изменил длину текстов
+            'new_description.*' => 'nullable',
             'descriptions.*' => 'required',
             'question_text' => 'nullable|max:255',
             'answers.*' => 'nullable|string|max:255',
@@ -101,26 +117,26 @@ class SlideController
             }
         }
 
-//        if (isset($validatedData['questions'])) {
-//            foreach ($validatedData['questions'] as $questionId => $questionData) {
-//                $question = Question::find($questionId);
-//                if ($question) {
-//                    $question->text = $questionData['text'];
-//                    $question->save();
-//
-//                    if (isset($questionData['answers'])) {
-//                        foreach ($questionData['answers'] as $answerId => $answerData) {
-//                            $answer = Answer::find($answerId);
-//                            if ($answer) {
-//                                $answer->text = $answerData['text'];
-//                                $answer->is_correct = isset($answerData['is_correct']);
-//                                $answer->save();
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
+        if ($request->has('questions')) {
+            foreach ($request->input('questions') as $questionId => $questionData) {
+                $question = Question::find($questionId);
+                if ($question) {
+                    $question->text = $questionData['text'];
+                    $question->save();
+
+                    if (isset($questionData['answers'])) {
+                        foreach ($questionData['answers'] as $answerId => $answerData) {
+                            $answer = Answer::find($answerId);
+                            if ($answer) {
+                                $answer->text = $answerData['text'];
+                                $answer->is_correct = isset($answerData['is_correct']); // Проверьте, установлен ли флаг is_correct
+                                $answer->save();
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         if ($request->hasFile('image')) {
             $mediaFile = $request->file('image');
@@ -186,5 +202,14 @@ class SlideController
         Storage::disk('public')->delete($mediaFile->file_path);
         $mediaFile->delete();
         return response()->json(['success' => true]);
+    }
+
+    public function deleteQuestion($questionId)
+    {
+        $question = Question::findOrFail($questionId);
+        $question->answers()->delete();
+        $question->delete();
+
+        return back()->with('success', 'Вопрос успешно удален.');
     }
 }
