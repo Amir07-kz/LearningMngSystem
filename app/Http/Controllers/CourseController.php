@@ -16,8 +16,14 @@ class CourseController extends Controller
 
     public function courseList()
     {
-        $user = Auth::user();
-        $isAdmin = $user->isAdmin();
+        if (Auth::check())
+        {
+            $user = Auth::user();
+            $isAdmin = $user->isAdmin();
+        } else {
+            redirect('/');
+        }
+
         $createdCourses = $user->courses()->get();
         $joinedCourses = $user->joinedCourses()->get();
         $isAuthenticated = Auth::check();
@@ -38,7 +44,8 @@ class CourseController extends Controller
     }
 
     public function joinToCourse(Request $request) {
-        $code = $request->input('code');
+        $code = $request->input('course_code');
+//        dd($code);
         $course = Course::where('join_code', $code)->first();
 
         if ($course) {

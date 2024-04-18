@@ -7,6 +7,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SlideController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +45,10 @@ Route::get('/courses/edit', [CourseController::class, 'edit']);
 
 Route::get('/courses/list', [CourseController::class, 'courseList'])->name('courses_list');
 
+Route::get('/account', [UserController::class, 'index'])->name('personal_account');
+
+Route::post('/account', [UserController::class, 'update'])->name('update_account');
+
 Route::get('/courses/{course}/slide/', [SlideController::class, 'firstSlide'])->name('slide.first');
 
 Route::post('/courses/{course}/slide/create', [SlideController::class, 'store'])->name('slides.store');
@@ -59,3 +64,5 @@ Route::post('/courses/{course}/slide/{slide}', [SlideController::class, 'update'
 Route::delete('/courses/{course}/slide/{slide}/description/{descriptionId}', [SlideController::class, 'slideContentRemove'])->name('slide.content.remove');
 
 Route::delete('/media/delete/{id}', [SlideController::class, 'deleteMedia'])->name('media.delete');
+
+Route::delete('/questions/{question}', [SlideController::class, 'deleteQuestion'])->name('questions.delete');
