@@ -171,6 +171,14 @@
             position: relative;
         }
 
+        .correct-answer {
+            background-color: lightgreen;
+        }
+
+        .wrong-answer {
+            background-color: salmon;
+        }
+
     </style>
 </head>
 <body>
@@ -219,100 +227,136 @@
         </div>
         <div class="content">
             <br>
-            {% if slide is defined %}
-            <form action="{{ route('slide.update', {'course': courseId, 'slide': slide.slide_number}) }}" method="post" enctype="multipart/form-data">
-                {{ csrf_field() }}
-                <div style="margin-top: 3%">
-                    <label for="title">Slide Title:</label>
-                    <input type="text" id="title" name="title" required value="{{ slide.title }}">
-                </div>
-                <div id="textContainer">
-                    {% for description in slide.descriptions %}
-                        <div class="description-block">
-                            <label for="description_{{ description.id }}">Text:</label>
-                            <textarea id="description_{{ description.id }}" name="descriptions[{{ description.id }}]">{{ description.description }}</textarea>
-                            {% if is_admin %}
-                                <button type="button" class="delete-button" data-description-id="{{ description.id }}">Delete</button>
+            {% if is_admin and slide is defined %}
+                <form action="{{ route('slide.update', {'course': courseId, 'slide': slide.slide_number}) }}" method="post" enctype="multipart/form-data">
+                    {{ csrf_field() }}
+                    <div style="margin-top: 3%">
+                        <label for="title">Slide Title:</label>
+                        <input type="text" id="title" name="title" required value="{{ slide.title }}">
+                    </div>
+                    <div id="textContainer">
+                        {% for description in slide.descriptions %}
+                            <div class="description-block">
+                                <label for="description_{{ description.id }}">Text:</label>
+                                <textarea id="description_{{ description.id }}" name="descriptions[{{ description.id }}]">{{ description.description }}</textarea>
+                                {% if is_admin %}
+                                    <button type="button" class="delete-button" data-description-id="{{ description.id }}">Delete</button>
+                                {% endif %}
+                                <button type="button" class="ai-button" data-description-id="{{ description.id }}">AI</button>
+                            </div>
+                            <div class="api-response" id="api-response-{{ description.id }}"></div>
+                            <div id="loading-{{ description.id }}" class="loading" style="display: none;">Loading...</div>                    {% endfor %}
+                        {% for mediaFile in slide.mediaFiles %}
+                            {% if mediaFile.file_type starts with 'image' %}
+                                <div class="image-container">
+                                    <img class="slide-image" src="{{ asset('storage/' ~ mediaFile.file_path) }}" alt="Media Image">
+                                    {% if is_admin %}
+                                        <button type="button" class="delete-media-button" data-id="{{ mediaFile.id }}">Delete</button>
+                                    {% endif %}
+                                </div>
                             {% endif %}
-                            <button type="button" class="ai-button" data-description-id="{{ description.id }}">AI</button>
+                        {% endfor %}
+                        <div class="quiz-section">
+                            {% for question in slide.questions %}
+                                <div class="question">
+                                    <input type="hidden" name="questions[{{ question.id }}][id]" value="{{ question.id }}">
+                                    <input class="question" type="text" name="questions[{{ question.id }}][text]" value="{{ question.text }}">
+                                    {% if is_admin %}
+                                        <button type="button" class="delete-question" data-question-id="{{ question.id }}">Удалить вопрос</button>
+                                    {% endif %}
+                                    {% for answer in question.answers %}
+                                        <div class="answer" data-is-correct="{{ answer.is_correct }}">
+                                            <input type="text" name="questions[{{ question.id }}][answers][{{ answer.id }}][text]" value="{{ answer.text }}">
+                                            <input type="checkbox" name="questions[{{ question.id }}][answers][{{ answer.id }}][is_correct]" {% if answer.is_correct %} checked {% endif %} disabled>
+                                            {% if is_admin %}
+                                                <button type="button" class="delete-answer">Удалить ответ</button>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                    <button type="button" class="show-answer">Узнать ответ</button>
+                                    {% if is_admin %}
+                                        <button type="button" onclick="addAnswer(this)">Добавить ответ</button>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
                         </div>
-                        <div class="api-response" id="api-response-{{ description.id }}"></div>
-                        <div id="loading-{{ description.id }}" class="loading" style="display: none;">Loading...</div>                    {% endfor %}
-                    {% for mediaFile in slide.mediaFiles %}
-                        {% if mediaFile.file_type starts with 'image' %}
-                            <div class="image-container">
-                                <img class="slide-image" src="{{ asset('storage/' ~ mediaFile.file_path) }}" alt="Media Image">
-                                {% if is_admin %}
-                                    <button type="button" class="delete-media-button" data-id="{{ mediaFile.id }}">Delete</button>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                    <div class="quiz-section">
-                        {% for question in slide.questions %}
-                            <div class="question">
-                                <input type="hidden" name="questions[{{ question.id }}][id]" value="{{ question.id }}">
-                                <input class="question" type="text" name="questions[{{ question.id }}][text]" value="{{ question.text }}">
-                                {% if is_admin %}
-                                    <button type="button" class="delete-question" data-question-id="{{ question.id }}">Удалить вопрос</button>
-                                {% endif %}
-                                {% for answer in question.answers %}
-                                    <div class="answer" data-is-correct="{{ answer.is_correct }}">
-                                        <input type="text" name="questions[{{ question.id }}][answers][{{ answer.id }}][text]" value="{{ answer.text }}">
-                                        <input type="checkbox" name="questions[{{ question.id }}][answers][{{ answer.id }}][is_correct]" {% if answer.is_correct %} checked {% endif %} disabled>
-                                        {% if is_admin %}
-                                            <button type="button" class="delete-answer">Удалить ответ</button>
-                                        {% endif %}
-                                    </div>
-                                {% endfor %}
-                                <button type="button" class="show-answer">Узнать ответ</button>
-                                {% if is_admin %}
-                                    <button type="button" onclick="addAnswer(this)">Добавить ответ</button>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
                     </div>
-                </div>
-                {% if is_admin %}
-                    <button type="button" id="addSectionButton">+ Add New Section</button>
-                {% endif %}
-                <div id="sectionContainer"></div>
-                <div class="content-actions" id="contentActions" style="display: none;">
-                    <button type="button" id="addTextButton">Text</button>
-                    <button type="button" id="addImageButton">Img</button>
-                    <button type="button" id="addTestButton">Test</button>
-                </div>
-                <div>
-                    <label style="display: none" for="imageUpload">Upload Image:</label>
-                    <input style="display: none" type="file" id="imageUpload" name="image" accept="image/*" onchange="previewImage(this);">
-                    <div id="imagePreviewContainer">
-                        <img id="imagePreview" src="" alt="Image Preview">
+                    {% if is_admin %}
+                        <button type="button" id="addSectionButton">+ Add New Section</button>
+                    {% endif %}
+                    <div id="sectionContainer"></div>
+                    <div class="content-actions" id="contentActions" style="display: none;">
+                        <button type="button" id="addTextButton">Text</button>
+                        <button type="button" id="addImageButton">Img</button>
+                        <button type="button" id="addTestButton">Test</button>
                     </div>
-                </div>
-                <div class="quiz-add-section" style="display: none;">
-                    <h2>Создание тестового вопроса</h2>
                     <div>
-{#                        добавить категорию вопрсоа #}
-                        <label for="question">Вопрос: </label>
-                        <input type="text" id="question" name="question_text">
+                        <label style="display: none" for="imageUpload">Upload Image:</label>
+                        <input style="display: none" type="file" id="imageUpload" name="image" accept="image/*" onchange="previewImage(this);">
+                        <div id="imagePreviewContainer">
+                            <img id="imagePreview" src="" alt="Image Preview">
+                        </div>
                     </div>
-                    <div class="answers">
-                        {% for answer in question.answers %}
-                            <div class="answer">
-                                <input type="text" name="answers[{{ question.id }}][{{ answer.id }}][text]" value="{{ answer.text }}">
-                                <input type="checkbox" name="correct_answers[{{ question.id }}][{{ answer.id }}]"
-                                       value="{{ answer.id }}" {% if answer.is_correct %} checked {% endif %}>
-                                Mark
-                            </div>
-                        {% endfor %}
+                    <div class="quiz-add-section" style="display: none;">
+                        <h2>Создание тестового вопроса</h2>
+                        <div>
+    {#                        добавить категорию вопрсоа #}
+                            <label for="question">Вопрос: </label>
+                            <input type="text" id="question" name="question_text">
+                        </div>
+                        <div class="answers">
+                            {% for answer in question.answers %}
+                                <div class="answer">
+                                    <input type="text" name="answers[{{ question.id }}][{{ answer.id }}][text]" value="{{ answer.text }}">
+                                    <input type="checkbox" name="correct_answers[{{ question.id }}][{{ answer.id }}]"
+                                           value="{{ answer.id }}" {% if answer.is_correct %} checked {% endif %}>
+                                    Mark
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button type="button" id="addAnswerButton">Добавить ответ</button>
                     </div>
-                    <button type="button" id="addAnswerButton">Добавить ответ</button>
-                </div>
-                {% if is_admin %}
-                    <button type="submit">Update Slide</button>
-                {% endif %}
-            </form>
+                    {% if is_admin %}
+                        <button type="submit">Update Slide</button>
+                    {% endif %}
+                </form>
             {% endif %}
+            {% if not is_admin %}
+                <form id="answerForm" method="post" action="{{ route('save.answers') }}">
+                    {{ csrf_field() }}
+                    {% set showSubmitButton = true %}
+                    {% for question in slide.questions %}
+                        <div class="user-question">
+                            <p>{{ question.text }}</p>
+                            {% set userHasAnswered = question.userAnswer ? true : false %}
+                            {% if userHasAnswered %}
+                                {% set showSubmitButton = false %}
+                            {% endif %}
+                            {% for answer in question.answers %}
+                                {% set answerClass = '' %}
+                                {% if userHasAnswered %}
+                                    {% if answer.id == question.userAnswer.answer_id %}
+                                        {% set answerClass = answer.is_correct ? 'correct-answer' : 'wrong-answer' %}
+                                    {% endif %}
+                                    <div class="{{ answerClass }}">
+                                        <input type="radio" name="answers[{{ question.id }}]" value="{{ answer.id }}" id="answer{{ answer.id }}" {{ userHasAnswered ? 'checked disabled' : '' }}>
+                                        <label for="answer{{ answer.id }}">{{ answer.text }}</label>
+                                    </div>
+                                {% else %}
+                                    <div>
+                                        <input type="radio" name="answers[{{ question.id }}]" value="{{ answer.id }}" id="answer{{ answer.id }}">
+                                        <label for="answer{{ answer.id }}">{{ answer.text }}</label>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    {% if showSubmitButton %}
+                        <button type="submit">Отправить ответ(-ы)</button>
+                    {% endif %}
+                </form>
+            {% endif %}
+            {#            <button type="button" class="ai-button" data-description-id="{{ description.id }}">AI</button>#}
             {% for description in slide.descriptions %}
                 <form action="{{ route('slide.content.remove', {'course': courseId, 'slide': slide.slide_number, 'descriptionId': description.id}) }}" method="post" style="display: none;">
                     {{ csrf_field() }}
@@ -339,7 +383,6 @@
         });
     });
 
-
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('form');
         form.addEventListener('submit', function(event) {
@@ -350,21 +393,56 @@
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('submit-user-answer')
                 }
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.statusText);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     console.log('Success:', data);
-                    alert('Слайд успешно обновлен');
+                    alert('Ответы успешно сохранены!');
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Ошибка обновления');
+                    alert('Ошибка при отправке ответов: ' + error.message);
                 });
         });
     });
 
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('answerForm'); // Убедитесь, что у формы есть id="answerForm"
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // предотвращаем стандартную отправку формы
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Ошибка при отправке ответов: ' + error.message);
+                });
+        });
+    });
 
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.delete-question').forEach(button => {

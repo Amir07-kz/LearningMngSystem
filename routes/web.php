@@ -66,3 +66,5 @@ Route::delete('/courses/{course}/slide/{slide}/description/{descriptionId}', [Sl
 Route::delete('/media/delete/{id}', [SlideController::class, 'deleteMedia'])->name('media.delete');
 
 Route::delete('/questions/{question}', [SlideController::class, 'deleteQuestion'])->name('questions.delete');
+
+Route::post('/save-answers', [CourseController::class, 'saveAnswers'])->name('save.answers');
