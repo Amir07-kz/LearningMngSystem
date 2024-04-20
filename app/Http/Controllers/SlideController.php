@@ -7,6 +7,7 @@ use App\Models\MediaFile;
 use App\Models\Question;
 use App\Models\Slide;
 use App\Models\SlideDescription;
+use App\Models\UserAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -56,6 +57,12 @@ class SlideController
             ->orderBy('slide_number')
             ->get();
 
+        foreach ($slide->questions as $question) {
+            $question->userAnswer = UserAnswer::where('user_id', $user->id)
+                ->where('question_id', $question->id)
+                ->first();
+        }
+
         return view('slides_show', [
             'is_admin' => $is_admin,
             'slide' => $slide,
@@ -89,7 +96,6 @@ class SlideController
             'correct_answers.*' => 'nullable',
 
         ]);
-//        dd($request->all());
 
         $slide = Slide::with('descriptions')->where('course_id', $courseId)->where('slide_number', $slideId)->firstOrFail();
         $slide->title = $validatedData['title'];

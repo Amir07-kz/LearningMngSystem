@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\UserAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -79,4 +80,23 @@ class CourseController extends Controller
         return view('courses.slides.create', ['courseId' => $courseId]);
     }
 
+    // перенести в SlideController
+    public function saveAnswers(Request $request)
+    {
+        try {
+            $userId = auth()->id();
+            $answers = $request->input('answers', []);
+
+            foreach ($answers as $questionId => $answerId) {
+                UserAnswer::create([
+                    'user_id' => $userId,
+                    'question_id' => $questionId,
+                    'answer_id' => $answerId
+                ]);
+            }
+            return response()->json(['success' => 'Ответ(-ы) сохранены!']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Ошибка при сохранении ответ(-ов): ' . $e->getMessage()], 500);
+        }
+    }
 }
