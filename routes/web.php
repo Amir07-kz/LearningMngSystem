@@ -68,3 +68,5 @@ Route::delete('/media/delete/{id}', [SlideController::class, 'deleteMedia'])->na
 Route::delete('/questions/{question}', [SlideController::class, 'deleteQuestion'])->name('questions.delete');
 
 Route::post('/save-answers', [CourseController::class, 'saveAnswers'])->name('save.answers');
+
+Route::get('course/{course}/users', [CourseController::class, 'showJoinedUsers'])->name('course.joined.users');
