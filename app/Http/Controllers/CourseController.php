@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Question;
+use App\Models\QuestionTheme;
 use App\Models\UserAnswer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -117,6 +119,37 @@ class CourseController extends Controller
             'isAdmin' => $isAdmin,
             'joinedCourses' => $joinedCourses,
             'is_authenticated' => $isAuthenticated
+        ]);
+    }
+
+    public function showUserStatistics($courseId, $userId)
+    {
+        $questions = Question::where('id', $courseId)->get();
+
+        $themes = $questions->groupBy('theme');
+        dd($themes);
+
+        $statistics = [];
+
+        foreach ($themes as $theme => $questionsGroup) {
+            $questionIds = $questionsGroup->pluck('id');
+
+            $correctCount = UserAnswer::where('user_id', $userId)
+                ->whereIn('question_id', $questionIds)
+                ->join('answers', 'user_answers.answer_id', '=', 'answers.id')
+                ->where('answers.is_correct', true)
+                ->count();
+
+            $statistics[] = [
+                'theme' => $theme,
+                'correctCount' => $correctCount
+            ];
+        }
+
+        return view('user_statistics', [
+            'statistics' => $statistics,
+            'userId' => $userId,
+            'courseId' => $courseId,
         ]);
     }
 }

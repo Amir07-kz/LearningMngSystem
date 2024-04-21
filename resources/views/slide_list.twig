@@ -258,6 +258,7 @@
                         {% endfor %}
                         <div class="quiz-section">
                             {% for question in slide.questions %}
+                                <a>Тема :</a> {{ question.theme }}
                                 <div class="question">
                                     <input type="hidden" name="questions[{{ question.id }}][id]" value="{{ question.id }}">
                                     <input class="question" type="text" name="questions[{{ question.id }}][text]" value="{{ question.text }}">
@@ -267,7 +268,7 @@
                                     {% for answer in question.answers %}
                                         <div class="answer" data-is-correct="{{ answer.is_correct }}">
                                             <input type="text" name="questions[{{ question.id }}][answers][{{ answer.id }}][text]" value="{{ answer.text }}">
-                                            <input type="checkbox" name="questions[{{ question.id }}][answers][{{ answer.id }}][is_correct]" {% if answer.is_correct %} checked {% endif %} disabled>
+                                            <input type="checkbox" name="correct_answers[{{ question.id }}][]" value="{{ answer.id }}" {% if answer.is_correct %} checked {% endif %}>
                                             {% if is_admin %}
                                                 <button type="button" class="delete-answer">Удалить ответ</button>
                                             {% endif %}
@@ -300,7 +301,9 @@
                     <div class="quiz-add-section" style="display: none;">
                         <h2>Создание тестового вопроса</h2>
                         <div>
-    {#                        добавить категорию вопрсоа #}
+                            <label for="question">Тема теста: </label>
+                            <input type="text" id="theme" name="question_theme">
+                            <br>
                             <label for="question">Вопрос: </label>
                             <input type="text" id="question" name="question_text">
                         </div>

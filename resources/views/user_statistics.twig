@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Радарная диаграмма компетенций</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Подключение Chart.js -->
+</head>
+<body>
+
+{{ dump(theme) }}
+<canvas id="myChart" width="400" height="400"></canvas>
+
+<script>
+    const statistics = [
+        { theme: 'Тема 1', correctCount: 5 },
+        { theme: 'Тема 2', correctCount: 3 },
+        // Добавьте больше тем и данных здесь...
+    ];
+
+    // Извлечение данных для меток и данных графика из статистики
+    const labels = statistics.map(stat => stat.theme);
+    const dataPoints = statistics.map(stat => stat.correctCount);
+
+    // Создание радарного чарта
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myRadarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Результаты по темам',
+                data: dataPoints,
+                fill: true,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgb(255, 99, 132)',
+                pointBackgroundColor: 'rgb(255, 99, 132)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(255, 99, 132)'
+            }]
+        },
+        options: {
+            elements: {
+                line: {
+                    borderWidth: 3
+                }
+            },
+            scale: {
+                ticks: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
