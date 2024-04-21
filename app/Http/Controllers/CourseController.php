@@ -46,7 +46,6 @@ class CourseController extends Controller
 
     public function joinToCourse(Request $request) {
         $code = $request->input('course_code');
-//        dd($code);
         $course = Course::where('join_code', $code)->first();
 
         if ($course) {
@@ -98,5 +97,26 @@ class CourseController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => 'Ошибка при сохранении ответ(-ов): ' . $e->getMessage()], 500);
         }
+    }
+
+    public function showJoinedUsers($courseId)
+    {
+        if (!Auth::check()) {
+            return redirect('/');
+        }
+
+        $user = Auth::user();
+        $isAdmin = $user->isAdmin();
+
+        $course = Course::with('users')->findOrFail($courseId);
+        $joinedCourses = $user->joinedCourses()->get();
+        $isAuthenticated = Auth::check();
+
+        return view('joined_user_list', [
+            'course' => $course,
+            'isAdmin' => $isAdmin,
+            'joinedCourses' => $joinedCourses,
+            'is_authenticated' => $isAuthenticated
+        ]);
     }
 }

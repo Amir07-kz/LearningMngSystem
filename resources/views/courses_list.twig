@@ -318,14 +318,15 @@
                     <div class="container">
                         <h4 class="course-title"><b>{{ course.title }}</b></h4>
                         <p class="course-description">{{ course.description }}</p>
-                        <button onclick="showJoinCode('join-code-{{ course.id }}')">Код присоединения</button>
-                        <p id="join-code-{{ course.id }}" class="join-code" style="display: none;">{{ course.join_code }}</p>
                         <p class="course-duration">{{ course.duration }} часов</p>
                         <a href="{{ url('/courses/' ~ course.id ~ '/slide/') }}">Изменить слайд</a>
+                        <button onclick="showJoinCode('join-code-{{ course.id }}')">Код присоединения</button>
+                        <p id="join-code-{{ course.id }}" class="join-code" style="display: none;">{{ course.join_code }}</p>
+                        <a href="{{ url('course/' ~ course.id ~ '/users') }}">Пользователи</a>
                     </div>
                 </div>
             {% else %}
-                <p>No courses</p>
+                <p>Нет созданных курсов</p>
             {% endfor %}
         </div>
     {% else %}

@@ -7,7 +7,7 @@
 </head>
 <body>
 <h1>Create new course</h1>
-<form action="/courses/create" method="post" enctype="multipart/form-data"> <!-- enctype is required for file upload -->
+<form action="/courses/create" method="post" enctype="multipart/form-data">
     {{ csrf_field() }}
     <div>
         <label for="title">Name of course:</label>
