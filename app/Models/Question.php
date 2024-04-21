@@ -9,7 +9,7 @@ class Question extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['text', 'correct_answer_id'];
+    protected $fillable = ['text', 'correct_answer_id', 'theme'];
 
     public function answers()
     {
@@ -20,4 +20,10 @@ class Question extends Model
     {
         return $this->belongsTo(Answer::class, 'correct_answer_id');
     }
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
+
 }

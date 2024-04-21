@@ -87,6 +87,7 @@ class SlideController
 
     public function update(Request $request, $courseId, $slideId)
     {
+//        dd($request->all());
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'new_description.*' => 'nullable',
@@ -94,7 +95,8 @@ class SlideController
             'question_text' => 'nullable|max:255',
             'answers.*' => 'nullable|string|max:255',
             'correct_answers.*' => 'nullable',
-
+            'questions.*.answers.*.is_correct' => 'sometimes|boolean',
+            'question_theme' => 'nullable|string'
         ]);
 
         $slide = Slide::with('descriptions')->where('course_id', $courseId)->where('slide_number', $slideId)->firstOrFail();
@@ -102,7 +104,8 @@ class SlideController
 
         if ($request->filled('question_text')) {
             $question = new Question([
-                'text' => $validatedData['question_text']
+                'text' => $validatedData['question_text'],
+                'theme' => $validatedData['question_theme']
             ]);
 
             $slide->questions()->save($question);
@@ -112,11 +115,11 @@ class SlideController
                 $correctAnswers = $request->input('correct_answers', []);
                 foreach ($answers as $index => $answerText) {
                     if (!empty($answerText)) {
+                        $isCorrect = in_array($index, $correctAnswers);
                         $answer = new Answer([
                             'text' => $answerText,
-                            'is_correct' => in_array($index + 1, $correctAnswers),
+                            'is_correct' => $isCorrect,
                         ]);
-
                         $question->answers()->save($answer);
                     }
                 }
@@ -130,14 +133,14 @@ class SlideController
                     $question->text = $questionData['text'];
                     $question->save();
 
-                    if (isset($questionData['answers'])) {
-                        foreach ($questionData['answers'] as $answerId => $answerData) {
-                            $answer = Answer::find($answerId);
-                            if ($answer) {
-                                $answer->text = $answerData['text'];
-                                $answer->is_correct = isset($answerData['is_correct']); // Ïğîâåğüòå, óñòàíîâëåí ëè ôëàã is_correct
-                                $answer->save();
-                            }
+                    $correctAnswers = $request->input('correct_answers.' . $questionId, []);
+
+                    foreach ($questionData['answers'] as $answerId => $answerData) {
+                        $answer = Answer::find($answerId);
+                        if ($answer) {
+                            $answer->text = $answerData['text'];
+                            $answer->is_correct = in_array($answerId, $correctAnswers);
+                            $answer->save();
                         }
                     }
                 }

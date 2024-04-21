@@ -69,4 +69,6 @@ Route::delete('/questions/{question}', [SlideController::class, 'deleteQuestion'
 
 Route::post('/save-answers', [CourseController::class, 'saveAnswers'])->name('save.answers');
 
-Route::get('course/{course}/users', [CourseController::class, 'showJoinedUsers'])->name('course.joined.users');
+Route::get('course/{course}/user', [CourseController::class, 'showJoinedUsers'])->name('course.joined.users');
+
+Route::get('course/{course}/user/{id}/statistics', [CourseController::class, 'showUserStatistics'])->name('course.user.statistics');

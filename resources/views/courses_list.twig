@@ -322,7 +322,7 @@
                         <a href="{{ url('/courses/' ~ course.id ~ '/slide/') }}">Изменить слайд</a>
                         <button onclick="showJoinCode('join-code-{{ course.id }}')">Код присоединения</button>
                         <p id="join-code-{{ course.id }}" class="join-code" style="display: none;">{{ course.join_code }}</p>
-                        <a href="{{ url('course/' ~ course.id ~ '/users') }}">Пользователи</a>
+                        <a href="{{ url('course/' ~ course.id ~ '/user') }}">Пользователи</a>
                     </div>
                 </div>
             {% else %}

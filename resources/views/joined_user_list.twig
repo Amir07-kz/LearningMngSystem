@@ -260,13 +260,14 @@
     </nav>
 </header>
 <div class="user-list-container">
-    <h1><a href="{{ route('courses_list') }}"><-</a>Пользователи курса: {{ course.title }}</h1>
+    <h1><a href="{{ route('courses_list') }}"><-</a> Пользователи курса: {{ course.title }}</h1>
     {% if isAdmin %}
         <table>
             <thead>
             <tr>
                 <th>Дата присоединения</th>
                 <th>Пользователь</th>
+                <th>Действия</th>
             </tr>
             </thead>
             <tbody>
@@ -274,6 +275,11 @@
                 <tr>
                     <td>{{ user.pivot.created_at|date('d F Y, H:i') }}</td>
                     <td>{{ user.email }}</td>
+                    <td>
+                        <a href="{{ url('course/' ~ course.id ~ '/user/' ~ user.id ~ '/statistics/')}}">Просмотр статистики</a>
+                        <br>
+                        <a href="">Удалить</a>
+                    </td>
                 </tr>
             {% else %}
                 <tr>
