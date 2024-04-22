@@ -124,28 +124,42 @@ class CourseController extends Controller
 
     public function showUserStatistics($courseId, $userId)
     {
-        $questions = Question::where('id', $courseId)->get();
+        $questions = Question::whereHas('slide', function ($query) use ($courseId) {
+            $query->where('course_id', $courseId);
+        })->with('answers')->get();
 
         $themes = $questions->groupBy('theme');
-        dd($themes);
 
         $statistics = [];
 
-        foreach ($themes as $theme => $questionsGroup) {
-            $questionIds = $questionsGroup->pluck('id');
+        foreach ($themes as $theme => $questions) {
+            $correctCount = 0;
+            $totalCount = 0;
 
-            $correctCount = UserAnswer::where('user_id', $userId)
-                ->whereIn('question_id', $questionIds)
-                ->join('answers', 'user_answers.answer_id', '=', 'answers.id')
-                ->where('answers.is_correct', true)
-                ->count();
+            foreach ($questions as $question) {
+                $correctAnswer = $question->answers->firstWhere('is_correct', true);
+                if ($correctAnswer) {
+                    $userCorrectAnswerCount = UserAnswer::where('question_id', $question->id)
+                        ->where('user_id', $userId)
+                        ->where('answer_id', $correctAnswer->id)
+                        ->count();
+
+                    $correctCount += $userCorrectAnswerCount;
+                }
+                $totalCount += UserAnswer::where('question_id', $question->id)
+                    ->where('user_id', $userId)
+                    ->count();
+            }
+
 
             $statistics[] = [
                 'theme' => $theme,
-                'correctCount' => $correctCount
+                'correctCount' => $correctCount,
+                'totalCount' => $totalCount
             ];
         }
 
+//        dd($statistics);
         return view('user_statistics', [
             'statistics' => $statistics,
             'userId' => $userId,
