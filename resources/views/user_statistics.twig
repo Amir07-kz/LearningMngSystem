@@ -3,41 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>Радарная диаграмма компетенций</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Подключение Chart.js -->
+    <style>
+        #myChart {
+            max-width: 800px;
+            max-height: 800px;
+            display: flex;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-{{ dump(theme) }}
-<canvas id="myChart" width="400" height="400"></canvas>
+<canvas id="myChart" width="100" height="100"></canvas>
 
 <script>
-    const statistics = [
-        { theme: 'Тема 1', correctCount: 5 },
-        { theme: 'Тема 2', correctCount: 3 },
-        // Добавьте больше тем и данных здесь...
-    ];
-
-    // Извлечение данных для меток и данных графика из статистики
+    var statistics = {{ statistics|json_encode|raw }};
+    console.log(statistics);
     const labels = statistics.map(stat => stat.theme);
-    const dataPoints = statistics.map(stat => stat.correctCount);
+    const correctCounts = statistics.map(stat => stat.correctCount);
+    const totalCounts = statistics.map(stat => stat.totalCount);
 
-    // Создание радарного чарта
     const ctx = document.getElementById('myChart').getContext('2d');
     const myRadarChart = new Chart(ctx, {
         type: 'radar',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Результаты по темам',
-                data: dataPoints,
-                fill: true,
-                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                borderColor: 'rgb(255, 99, 132)',
-                pointBackgroundColor: 'rgb(255, 99, 132)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(255, 99, 132)'
-            }]
+            datasets: [
+                {
+                    label: 'Правильные ответы',
+                    data: correctCounts,
+                    fill: true,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    pointBackgroundColor: 'rgb(255, 99, 132)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(255, 99, 132)'
+                },
+                {
+                    label: 'Всего ответов',
+                    data: totalCounts,
+                    fill: true,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgb(54, 162, 235)',
+                    pointBackgroundColor: 'rgb(54, 162, 235)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(54, 162, 235)'
+                }
+            ]
         },
         options: {
             elements: {
@@ -45,9 +59,17 @@
                     borderWidth: 3
                 }
             },
-            scale: {
-                ticks: {
-                    beginAtZero: true
+            scales: {
+                r: {
+                    angleLines: {
+                        display: false
+                    },
+                    suggestedMin: 0,
+                    suggestedMax: 5,
+                    ticks: {
+                        stepSize: 1,
+                        beginAtZero: true
+                    }
                 }
             }
         }
