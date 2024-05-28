@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration page</title>
+    <title>Регистрация</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,9 +45,9 @@
 </head>
 <body>
 <form action="/registration" method="post">
-    <h2>Registration</h2>
+    <h2>Регистрация</h2>
     {{ csrf_field() }}
-    <input type="text" name="name" placeholder="Name">
+    <input type="text" name="name" placeholder="Имя">
     {% if errors.bags.default.messages.name %}
         <div class="error">{{ errors.bags.default.messages.name|first }}</div>
     {% endif %}
@@ -55,11 +55,12 @@
     {% if errors.bags.default.messages.email %}
         <div class="error">{{ errors.bags.default.messages.email|first }}</div>
     {% endif %}
-    <input type="password" name="password" placeholder="Password">
+    <input type="password" name="password" placeholder="Пароль">
     {% if errors.bags.default.messages.password %}
         <div class="error">{{ errors.bags.default.messages.password|first }}</div>
     {% endif %}
     <input type="submit" value="Registration">
+    <a href="{{ route('courses_list') }}">На главную страницу</a>
 </form>
 </body>
 </html>

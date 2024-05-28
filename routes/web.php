@@ -21,6 +21,11 @@ use App\Http\Controllers\UserController;
 
 Route::post('/api/send-request', [ApiController::class, 'sendRequest'])->name('api.sendRequest');
 
+Route::post('/api/send-youtube', [ApiController::class, 'sendYouTube']);
+
+Route::post('/api/generate-tests', [ApiController::class, 'generateTests'])->name('api.generateTests');
+
+
 Route::get('/registration', [RegistrationController::class, 'index'])->name('registration');
 
 Route::post('/registration', [RegistrationController::class, 'store']);
