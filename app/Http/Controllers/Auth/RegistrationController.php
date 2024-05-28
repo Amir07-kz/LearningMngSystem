@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 
-class RegistrationController extends Controller // Исправлено наследование
+class RegistrationController extends Controller
 {
     public function index() {
         return view('registration');

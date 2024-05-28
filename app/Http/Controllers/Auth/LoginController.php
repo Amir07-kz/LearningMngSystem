@@ -28,11 +28,10 @@ class LoginController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'I can\'t find your account',
+            'email' => 'РќРµ РјРѕРіСѓ РЅР°Р№С‚Рё РІР°С€ Р°РєРєР°СѓРЅС‚',
         ]);
     }
 
-    // Выход из системы
     public function logout(Request $request)
     {
         Auth::logout();

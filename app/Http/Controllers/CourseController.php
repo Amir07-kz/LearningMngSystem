@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use App\Models\Course;
 use App\Models\Question;
 use App\Models\QuestionTheme;
@@ -84,17 +85,27 @@ class CourseController extends Controller
     // перенести в SlideController
     public function saveAnswers(Request $request)
     {
+        $submissionToken = $request->input('submissionToken');
+        if ($request->session()->has('lastToken') && $request->session()->get('lastToken') === $submissionToken) {
+            return response()->json(['error' => 'Спасибо за отправку'], 422);
+        }
+        $request->session()->put('lastToken', $submissionToken);
         try {
             $userId = auth()->id();
-            $answers = $request->input('answers', []);
+            $answersData = $request->input('answers', []);
 
-            foreach ($answers as $questionId => $answerId) {
-                UserAnswer::create([
-                    'user_id' => $userId,
-                    'question_id' => $questionId,
-                    'answer_id' => $answerId
-                ]);
+            foreach ($answersData as $questionId => $selectedAnswers) {
+                foreach ($selectedAnswers as $answerId) {
+                    UserAnswer::create([
+                        'user_id' => $userId,
+                        'question_id' => $questionId,
+                        'answer_id' => $answerId
+                    ]);
+                }
             }
+
+            $request->session()->put('form_submitted', true);
+
             return response()->json(['success' => 'Ответ(-ы) сохранены!']);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Ошибка при сохранении ответ(-ов): ' . $e->getMessage()], 500);
@@ -124,6 +135,15 @@ class CourseController extends Controller
 
     public function showUserStatistics($courseId, $userId)
     {
+        if (!Auth::check()) {
+            return redirect('/');
+        }
+
+        $user = Auth::user();
+        $isAdmin = $user->isAdmin();
+
+        $isAuthenticated = Auth::check();
+
         $questions = Question::whereHas('slide', function ($query) use ($courseId) {
             $query->where('course_id', $courseId);
         })->with('answers')->get();
@@ -134,9 +154,10 @@ class CourseController extends Controller
 
         foreach ($themes as $theme => $questions) {
             $correctCount = 0;
-            $totalCount = 0;
+            $answerOptionsCount = 0;  // Счетчик для общего числа вариантов ответов
 
             foreach ($questions as $question) {
+                // Подсчет правильных ответов, как и раньше
                 $correctAnswer = $question->answers->firstWhere('is_correct', true);
                 if ($correctAnswer) {
                     $userCorrectAnswerCount = UserAnswer::where('question_id', $question->id)
@@ -146,21 +167,25 @@ class CourseController extends Controller
 
                     $correctCount += $userCorrectAnswerCount;
                 }
-                $totalCount += UserAnswer::where('question_id', $question->id)
-                    ->where('user_id', $userId)
-                    ->count();
+
+                // Подсчет всех возможных ответов для вопроса
+                $answerOptionsCount += $question->answers->count();
             }
+            $answerOptionsCount = min($answerOptionsCount, 10);
 
-
+//            dd($answerOptionsCount);
+            // Добавление статистики по теме
             $statistics[] = [
                 'theme' => $theme,
                 'correctCount' => $correctCount,
-                'totalCount' => $totalCount
+                'answerOptionsCount' => $answerOptionsCount  // Общее число вариантов ответов
             ];
         }
 
-//        dd($statistics);
         return view('user_statistics', [
+            'url' => url()->previous(),
+            'isAdmin' => $isAdmin,
+            'is_authenticated' =>$isAuthenticated,
             'statistics' => $statistics,
             'userId' => $userId,
             'courseId' => $courseId,

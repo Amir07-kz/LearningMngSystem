@@ -48,10 +48,13 @@ class SlideController
             $is_admin = false;
         }
 
+        $submissionToken = uniqid('form_', true);
+
         $slide = Slide::with(['descriptions', 'mediaFiles', 'questions.answers'])
             ->where('course_id', $courseId)
             ->where('slide_number', $slideNumber)
             ->firstOrFail();
+//        dd($slide);
 
         $slides = Slide::where('course_id', $courseId)
             ->orderBy('slide_number')
@@ -62,8 +65,10 @@ class SlideController
                 ->where('question_id', $question->id)
                 ->first();
         }
+//        dd($question);
 
         return view('slides_show', [
+            'submissionToken' => $submissionToken,
             'is_admin' => $is_admin,
             'slide' => $slide,
             'slides' => $slides,
@@ -87,7 +92,6 @@ class SlideController
 
     public function update(Request $request, $courseId, $slideId)
     {
-//        dd($request->all());
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'new_description.*' => 'nullable',
@@ -96,7 +100,8 @@ class SlideController
             'answers.*' => 'nullable|string|max:255',
             'correct_answers.*' => 'nullable',
             'questions.*.answers.*.is_correct' => 'sometimes|boolean',
-            'question_theme' => 'nullable|string'
+            'question_theme' => 'nullable|string',
+            'file' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,mp4,avi,mp3,wav,doc,docx,pdf,xls,xlsx,ppt,pptx'
         ]);
 
         $slide = Slide::with('descriptions')->where('course_id', $courseId)->where('slide_number', $slideId)->firstOrFail();
@@ -130,7 +135,7 @@ class SlideController
             foreach ($request->input('questions') as $questionId => $questionData) {
                 $question = Question::find($questionId);
                 if ($question) {
-                    $question->text = $questionData['text'];
+                    $question->text     = $questionData['text'];
                     $question->save();
 
                     $correctAnswers = $request->input('correct_answers.' . $questionId, []);
@@ -147,12 +152,14 @@ class SlideController
             }
         }
 
-        if ($request->hasFile('image')) {
-            $mediaFile = $request->file('image');
-            $filePath = $mediaFile->store('image', 'public');
+        if ($request->hasFile('file')) {
+            $mediaFile = $request->file('file');
+            $fileName = $mediaFile->getClientOriginalName();
+            $filePath = $mediaFile->store('files', 'public');
             $fileType = $mediaFile->getMimeType();
 
             MediaFile::create([
+                'file_name' => $fileName,
                 'related_id' => $slide->id,
                 'file_path'  => $filePath,
                 'file_type'  => $fileType

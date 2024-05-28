@@ -2,12 +2,12 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Детали слайда {{ slides.title }}</title>
+    <title>РЎР»Р°Р№Рґ : {{ slide.title }}</title>
 </head>
 <body>
 <div class="container">
     <div class="slide-list">
-        {% include 'slide_list.twig' with {'slides': slides, 'courseId': courseId, 'is_admin': is_admin, 'is_user': user} %}
+        {% include 'slide_list.twig' with {'slides': slides, 'courseId': courseId, 'is_admin': is_admin, 'is_user': user, 'submissionToken': submissionToken} %}
     </div>
     <div class="content">
         <p>{{ slides.description }}</p>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Вход в систему</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,19 +45,20 @@
 </head>
 <body>
 <form action="/login" method="post">
-    <h2>Login</h2>
+    <h2>Вход в систему</h2>
     {{ csrf_field() }}
     <input type="email" name="email" placeholder="Email">
     {% if errors.bags.default.messages.email %}
         <div class="error">{{ errors.bags.default.messages.email|first }}</div>
     {% endif %}
-    <input type="password" name="password" placeholder="Password">
+    <input type="password" name="password" placeholder="Пароль">
     {% if errors.bags.default.messages.password %}
         <div class="error">{{ errors.bags.default.messages.password|first }}</div>
     {% endif %}
     <input type="submit" value="Login">
 
-    <a href="{{ route('registration') }}">If you not Registration</a>
+    <a href="{{ route('registration') }}">Зарегистрироваться как пользователь</a>
+    <a href="{{ route('registration') }}">Зарегистрироваться как организация</a>
 </form>
 </body>
 </html>

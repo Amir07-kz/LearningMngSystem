@@ -3,27 +3,68 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create courses</title>
+    <title>Создание курса</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        form {
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"], input[type="password"], input[type="email"], input[type="submit"], input[type="number"], textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-<h1>Create new course</h1>
-<form action="/courses/create" method="post" enctype="multipart/form-data">
-    {{ csrf_field() }}
-    <div>
-        <label for="title">Name of course:</label>
-        <input type="text" id="title" name="title" required>
-    </div>
-    <div>
-        <label for="description">Description of course:</label>
-        <textarea id="description" name="description" required></textarea>
-    </div>
-    <div>
-        <label for="duration">Duration (in hours):</label>
-        <input type="number" id="duration" name="duration" required>
-    </div>
-    <div>
-        <button type="submit">Create course</button>
-    </div>
-</form>
+<div>
+    <h1>Создание нового курса</h1>
+    <form action="/courses/create" method="post" enctype="multipart/form-data">
+        {{ csrf_field() }}
+        <div>
+            <label for="title">Название курса:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div>
+            <label for="description">Короткое описание курса:</label>
+            <textarea id="description" name="description" required></textarea>
+        </div>
+        <div>
+            <label for="duration">Время затратность (в часах):</label>
+            <input type="number" id="duration" name="duration" required>
+        </div>
+        <div>
+            <button type="submit">Создать курс</button>
+        </div>
+        <a href="{{ route('courses_list') }}">На главную страницу</a>
+    </form>
+</div>
 </body>
 </html>
