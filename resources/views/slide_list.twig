@@ -423,7 +423,6 @@
                     <input type="hidden" name="submissionToken" value="{{ submissionToken }}">
                     {% for question in slide.questions %}
                         <div class="user-question">
-{#                            {{ dump(question.id) }}#}
                             <p>{{ question.text }}</p>
                             {% for answer in question.answers %}
                                 {% set answerClass = '' %}
@@ -462,6 +461,7 @@
                     <div id="loading_{{ description.id }}" class="loading" style="display: none; margin-left: 10%">Загрузка...</div>
                 </div>
             {% endif %}
+            <div class="generated-test"></div>
         </div>
     </div>
 </div>
@@ -928,36 +928,45 @@
         }
     }
 
-    //
+    document.addEventListener('DOMContentLoaded', function () {
+        const answerButtons = document.querySelectorAll('.show-answer');
+        answerButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const answers = this.parentNode.querySelectorAll('.answer');
+                answers.forEach(answer => {
+                    const isCorrect = answer.getAttribute('data-is-correct');
+                    if (isCorrect === '1') {
+                        answer.style.backgroundColor = 'lightgreen';
+                    }
+                });
+            });
+        });
 
-    document.addEventListener('DOMContentLoaded', function() {
         const additionalTestsButtons = document.querySelectorAll('.ai-generator');
 
         additionalTestsButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const incorrectQuestions = [];
+                const form = document.getElementById('answerForm');
 
-                document.querySelectorAll('.user-question').forEach(questionDiv => {
-                    const questionText = questionDiv.querySelector('p').textContent;
-                    const answers = questionDiv.querySelectorAll('input[type="checkbox"]');
-                    let hasIncorrectAnswer = false;
+                form.querySelectorAll('.user-question').forEach(questionDiv => {
+                    const questionText = questionDiv.querySelector('p').textContent.trim();
+                    const wrongAnswers = questionDiv.querySelectorAll('.wrong-answer');
                     const selectedAnswers = [];
 
                     console.log('Вопрос:', questionText);
 
-                    answers.forEach(answer => {
-                        if (answer.checked) {
-                            const answerText = answer.nextElementSibling ? answer.nextElementSibling.textContent.trim() : '';
+                    wrongAnswers.forEach(wrongAnswer => {
+                        const checkbox = wrongAnswer.querySelector('input[type="checkbox"]');
+                        const label = wrongAnswer.querySelector('label');
+                        if (checkbox && label) {
+                            const answerText = label.textContent.trim();
                             selectedAnswers.push(answerText);
-                            console.log('Выбранный ответ:', answerText);
-                        }
-                        if (answer.parentElement.classList.contains('wrong-answer') && answer.checked) {
-                            hasIncorrectAnswer = true;
                             console.log('Неправильный ответ найден:', answerText);
                         }
                     });
 
-                    if (hasIncorrectAnswer) {
+                    if (selectedAnswers.length > 0) {
                         incorrectQuestions.push({
                             question: questionText,
                             userAnswers: selectedAnswers
@@ -965,14 +974,13 @@
                     }
                 });
 
-                // console.log('Вопросы с неправильными ответами для отправки на сервер:', incorrectQuestions);
+                console.log('Вопросы с неправильными ответами для отправки на сервер:', incorrectQuestions);
 
-                generateTest(incorrectQuestions);
-                // if (incorrectQuestions.length > 0) {
-                //     generateTest(incorrectQuestions);
-                // } else {
-                //     console.log('Нет вопросов с неправильными ответами.');
-                // }
+                if (incorrectQuestions.length > 0) {
+                    generateTest(incorrectQuestions);
+                } else {
+                    console.log('Нет вопросов с неправильными ответами.');
+                }
             });
         });
 
@@ -986,19 +994,58 @@
                 },
                 body: JSON.stringify({ questions: incorrectQuestions })
             })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     console.log('Сгенерированные тесты:', data);
+                    displayGeneratedTests(data.generated_tests);
                     alert('Тестовые задания успешно сгенерированы!');
                 })
                 .catch(error => console.error('Ошибка при генерации тестов:', error));
         }
-    });
 
+        window.showCorrectAnswer = function(index) {
+            const answers = document.querySelectorAll(`div[data-question-index="${index}"] .answer input[type="checkbox"]`);
+            answers.forEach(answer => {
+                const isCorrect = answer.getAttribute('data-is-correct') === 'true';
+                answer.parentElement.classList.remove('correct-answer', 'wrong-answer');
+
+                if (isCorrect) {
+                    answer.parentElement.classList.add('correct-answer');
+                } else {
+                    answer.parentElement.classList.add('wrong-answer');
+                }
+            });
+        };
+
+        function displayGeneratedTests(tests) {
+            console.log(tests);
+            const generatedTestContainer = document.querySelector('.generated-test');
+            generatedTestContainer.innerHTML = '';
+
+            tests.forEach((test, index) => {
+                const testElement = document.createElement('div');
+                testElement.setAttribute('data-question-index', index);
+
+                const questionText = test.match(/#\?(.*?)#\?/)[1].trim();
+                const answers = test.split(/#\?/)[2].split(/#\$/).filter(answer => answer.trim()).map(answer => {
+                    const isCorrect = /#\+|\+$|\+#+/.test(answer);
+                    const answerText = answer.replace(/[#\+$]+/g, '').trim();
+                    return { answerText, isCorrect: isCorrect };
+                });
+
+                const questionHTML = `<p>${questionText}</p>`;
+                const answersHTML = answers.map((answer, i) => `
+            <div class="answer">
+                <input type="checkbox" id="generated-answer-${index}-${i}" data-is-correct="${answer.isCorrect}">
+                <label for="generated-answer-${index}-${i}">${answer.answerText}</label>
+            </div>
+        `).join('');
+
+                const showAnswerButton = `<button class="show-answer-btn" onclick="showCorrectAnswer(${index})">Показать правильный ответ</button>`;
+                testElement.innerHTML = questionHTML + answersHTML + showAnswerButton;
+                generatedTestContainer.appendChild(testElement);
+            });
+        }
+    });
 </script>
 </html>

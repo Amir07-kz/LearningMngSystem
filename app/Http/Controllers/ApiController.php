@@ -56,19 +56,18 @@ class ApiController
             }
 
             if (empty($videos)) {
-                return response()->json(['error' => '����� �� �������'], 404);
+                return response()->json(['error' => '����� �� �������'], 404);
             }
 
             return response()->json(['videos' => $videos]);
         } catch (\Exception $e) {
-            return response()->json(['error' => '��������� ������: ' . $e->getMessage()], 500);
+            return response()->json(['error' => '��������� ������: ' . $e->getMessage()], 500);
         }
     }
 
     public function generateTests(Request $request)
     {
-        dd($request);
-        Log::info('�������� ������ ��� ��������� ������:', $request->all());
+        Log::info('Получены данные для генерации тестов:', $request->all());
         $questions = $request->input('questions');
 
         $client = new Client(env('API_KEY'));
@@ -80,22 +79,40 @@ class ApiController
                 $questionText = $questionData['question'];
                 $userAnswers = implode(', ', $questionData['userAnswers']);
 
-                Log::info('��������� �������:', ['question' => $questionText, 'userAnswers' => $userAnswers]);
+                Log::info('Обработка вопроса:', ['question' => $questionText, 'userAnswers' => $userAnswers]);
 
-                $textPart = new TextPart("������ ����� �������� ������ �� ������ ���������� �������: $questionText. ������ ������������: $userAnswers");
+                // Формируем запрос для Gemini API
+                $prompt = "В вопросе \"$questionText\".\n
+                Пользователь ответил: \"$userAnswers\".\n
+                На основании ошибки пользователя сгенерируй тестовое задание с измененным вопросом и вариантами ответа для работы над ошибками.\n
+                Сгенерированный вопрос заключи в #? и в конце вопроса #?\n
+                Каждый вариант ответа заключи в #$ и в конце ответа #$\n
+                Выдели правильный ответ #+ и в конце #+\n";
+
+                $textPart = new TextPart($prompt);
+
+                Log::info('Сформированный запрос:', ['prompt' => $prompt]);
 
                 $response = $client->geminiPro()->generateContent($textPart);
-                $generatedTests[] = $response->text();
+
+                Log::info('Ответ от API:', ['response' => $response]);
+
+                if (isset($response->error)) {
+                    Log::error('Ошибка в ответе API:', ['error' => $response->error]);
+                    return response()->json(['error' => $response->error], 500);
+                }
+
+                $generatedTests[] = json_decode(json_encode($response->text()));
             }
 
-            Log::info('��������������� �����:', ['generated_tests' => $generatedTests]);
+            Log::info('Сгенерированные тесты:', ['generated_tests' => $generatedTests]);
 
             return response()->json([
                 'generated_tests' => $generatedTests
             ]);
 
         } catch (\Exception $e) {
-            Log::error('������ ��� ��������� ������:', ['error' => $e->getMessage()]);
+            Log::error('Ошибка при генерации тестов:', ['error' => $e->getMessage()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
