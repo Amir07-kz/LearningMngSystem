@@ -7,9 +7,11 @@ use App\Models\Course;
 use App\Models\Question;
 use App\Models\QuestionTheme;
 use App\Models\UserAnswer;
+use Google\Service\ApigeeRegistry\Api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+//use App\Http\Controllers\ApiController;
 
 class CourseController extends Controller
 {
@@ -36,6 +38,7 @@ class CourseController extends Controller
             'courses' => $createdCourses,
             'joinedCourses' => $joinedCourses,
             'isAdmin' => $isAdmin,
+            'userId' => \auth()->id(),
             'is_authenticated' => $isAuthenticated
         ]);
     }
@@ -173,7 +176,6 @@ class CourseController extends Controller
             }
             $answerOptionsCount = min($answerOptionsCount, 10);
 
-//            dd($answerOptionsCount);
             // Добавление статистики по теме
             $statistics[] = [
                 'theme' => $theme,
@@ -189,6 +191,36 @@ class CourseController extends Controller
             'statistics' => $statistics,
             'userId' => $userId,
             'courseId' => $courseId,
+            'questionsAndAnswers' => $this->questionsAndAnswers($courseId, $userId)
         ]);
+    }
+
+    public function questionsAndAnswers($courseId, $userId)
+    {
+        $questions = Question::whereHas('slide', function ($query) use ($courseId) {
+            $query->where('course_id', $courseId);
+        })->with(['answers', 'userAnswers' => function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        }])->get();
+
+        $themes = $questions->groupBy('theme');
+
+        $questionsAndAnswers = [];
+        foreach ($themes as $theme => $questions) {
+            foreach ($questions as $question) {
+                $userAnswer = $question->userAnswers->first();
+                $correctAnswer = $question->answers->where('is_correct', true)->first();
+
+                $questionsAndAnswers[] = [
+                    'theme' => $theme,
+                    'question' => $question->text,
+                    'answers' => $question->answers->pluck('text'),
+                    'correctAnswer' => $correctAnswer ? $correctAnswer->text : null,
+                    'userAnswer' => $userAnswer ? $userAnswer->answer->text : null,
+                ];
+            }
+        }
+
+        return ApiController::generateStatistics($questionsAndAnswers);
     }
 }

@@ -354,6 +354,9 @@
                         <p class="course-description">{{ course.description }}</p>
                         <p class="course-duration">{{ course.duration }} hours</p>
                         <a href="{{ url('/courses/' ~ course.id ~ '/slide/') }}">Пройти курс</a>
+                        <br> {# нужно добавить логику после завершения курса чтобы отбр статстику #}
+{#                        <a href="{{ url('course/' ~ course.id ~ '/user') }}">Статистика</a>#}
+                        <a href="{{ url('course/' ~ course.id ~ '/user/' ~ userId ~ '/statistics/')}}">Просмотр статистики</a>
                     </div>
                 </div>
             {% else %}

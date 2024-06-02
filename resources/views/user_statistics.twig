@@ -8,7 +8,14 @@
             max-width: 800px;
             max-height: 800px;
             display: flex;
+            justify-content: center;  /* Выравниваем содержимое по центру */
+            margin-left: 20%;        /* Автоматическое выравнивание по левому краю */
         }
+
+        .competitions {
+            justify-content: center;
+        }
+
         .course-card {
             box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
             transition: 0.3s;
@@ -309,11 +316,28 @@
     </nav>
 </header>
 
-<a href="{{ url }}"><-Назад к спискам пользователей</a>
+<a href="{{ url }}"><-Назад</a>
 
 <canvas id="myChart" width="100" height="100"></canvas>
 
+<div class="competitions" id="competitions">
+    <p></p>
+</div>
+
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var competitions = {{ questionsAndAnswers|json_encode|raw }};
+
+        var generatedStatistics = competitions.original.generated_statistics;
+        var competitionsElement = document.getElementById('competitions');
+
+        var formattedStatistics = generatedStatistics
+            .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')  // Жирный текст
+            .replace(/\n/g, '<br>');                // Переносы строки
+
+        competitionsElement.innerHTML = formattedStatistics;
+    });
+
     var statistics = {{ statistics|json_encode|raw }};
     const labels = statistics.map(stat => stat.theme);
     const correctCounts = statistics.map(stat => stat.correctCount);
