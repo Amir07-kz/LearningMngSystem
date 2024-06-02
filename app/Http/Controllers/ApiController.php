@@ -12,13 +12,18 @@ use Illuminate\Support\Facades\Log;
 
 class ApiController
 {
+    private $gemeniClient;
+    public function __construct()
+    {
+        $this->gemeniClient = new Client(env('API_KEY'));
+    }
+
     public function sendRequest(Request $request)
     {
         $inputText = $request->input('text');
-        $client = new Client(env('API_KEY'));
 
         try {
-            $response = $client->geminiPro()->generateContent(
+            $response = $this->gemeniClient->geminiPro()->generateContent(
                 new TextPart($inputText)
             );
 
@@ -70,8 +75,6 @@ class ApiController
         Log::info('Получены данные для генерации тестов:', $request->all());
         $questions = $request->input('questions');
 
-        $client = new Client(env('API_KEY'));
-
         try {
             $generatedTests = [];
 
@@ -93,7 +96,7 @@ class ApiController
 
                 Log::info('Сформированный запрос:', ['prompt' => $prompt]);
 
-                $response = $client->geminiPro()->generateContent($textPart);
+                $response = $this->gemeniClient->geminiPro()->generateContent($textPart);
 
                 Log::info('Ответ от API:', ['response' => $response]);
 
@@ -113,6 +116,35 @@ class ApiController
 
         } catch (\Exception $e) {
             Log::error('Ошибка при генерации тестов:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public static function generateStatistics(array $questionsAndAnswers)
+    {
+        $client = new Client(env('API_KEY'));
+
+        try {
+            $prompt = "Это ответы пользователя, на тестовые задания \"" . json_encode($questionsAndAnswers) . "\".\n
+                Оцени компетенции сотрудника по данным из теста, просто порекомендуй материалы, дополнительные источники\n";
+
+            $textPart = new TextPart($prompt);
+
+            $response = $client->geminiPro()->generateContent($textPart);
+
+            if (isset($response->error)) {
+                Log::error('Ошибка в ответе API:', ['error' => $response->error]);
+                return response()->json(['error' => $response->error], 500);
+            }
+
+            $generatedStatistics = json_decode(json_encode($response->text()));
+
+            return response()->json([
+                'generated_statistics' => $generatedStatistics
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Ошибка при генерации статистики:', ['error' => $e->getMessage()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

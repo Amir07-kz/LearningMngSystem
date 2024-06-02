@@ -289,6 +289,10 @@
             </tbody>
         </table>
     {% else %}
-        <p>У вас нет прав на просмотр этой информации.</p>
+        {% for user in course.users %}
+            <td>
+                <a href="{{ url('course/' ~ course.id ~ '/user/' ~ user.id ~ '/statistics/')}}">Статистика</a>
+            </td>
+        {% endfor %}
     {% endif %}
 </div>
