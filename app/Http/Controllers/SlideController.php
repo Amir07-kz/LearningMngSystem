@@ -54,7 +54,6 @@ class SlideController
             ->where('course_id', $courseId)
             ->where('slide_number', $slideNumber)
             ->firstOrFail();
-//        dd($slide);
 
         $slides = Slide::where('course_id', $courseId)
             ->orderBy('slide_number')
@@ -65,7 +64,6 @@ class SlideController
                 ->where('question_id', $question->id)
                 ->first();
         }
-//        dd($question);
 
         return view('slides_show', [
             'submissionToken' => $submissionToken,

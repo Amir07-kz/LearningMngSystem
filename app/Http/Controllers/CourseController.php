@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Question;
 use App\Models\QuestionTheme;
 use App\Models\UserAnswer;
+use Dflydev\DotAccessData\Data;
 use Google\Service\ApigeeRegistry\Api;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -157,30 +158,30 @@ class CourseController extends Controller
 
         foreach ($themes as $theme => $questions) {
             $correctCount = 0;
-            $answerOptionsCount = 0;  // Счетчик для общего числа вариантов ответов
+            $correctOptionsCount = 0; // Счетчик для общего числа правильных вариантов ответов
 
             foreach ($questions as $question) {
-                // Подсчет правильных ответов, как и раньше
+                // Подсчет правильных ответов, получение объекта ответа, где 'is_correct' равно true
                 $correctAnswer = $question->answers->firstWhere('is_correct', true);
                 if ($correctAnswer) {
+                    $correctOptionsCount++; // Увеличиваем счетчик правильных ответов, если правильный ответ найден
+
+                    // Подсчет, сколько раз пользователь выбрал этот правильный ответ
                     $userCorrectAnswerCount = UserAnswer::where('question_id', $question->id)
                         ->where('user_id', $userId)
                         ->where('answer_id', $correctAnswer->id)
                         ->count();
 
-                    $correctCount += $userCorrectAnswerCount;
+                    $correctCount += $userCorrectAnswerCount; // Суммируем количество правильных ответов пользователя
                 }
-
-                // Подсчет всех возможных ответов для вопроса
-                $answerOptionsCount += $question->answers->count();
             }
-            $answerOptionsCount = min($answerOptionsCount, 10);
+
 
             // Добавление статистики по теме
             $statistics[] = [
                 'theme' => $theme,
                 'correctCount' => $correctCount,
-                'answerOptionsCount' => $answerOptionsCount  // Общее число вариантов ответов
+                'answerOptionsCount' => $correctOptionsCount // Общее число правильных вариантов ответов
             ];
         }
 

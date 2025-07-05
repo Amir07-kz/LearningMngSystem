@@ -14,7 +14,8 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "rcrowe/twigbridge": "^0.14.1",
-        "twig/twig": "^3.8"
+        "twig/twig": "^3.8",
+      "ext-memcache": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

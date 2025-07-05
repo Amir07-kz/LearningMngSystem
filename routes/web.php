@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SlideController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TEST\MainClass;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,3 +78,5 @@ Route::post('/save-answers', [CourseController::class, 'saveAnswers'])->name('sa
 Route::get('course/{course}/user', [CourseController::class, 'showJoinedUsers'])->name('course.joined.users');
 
 Route::get('course/{course}/user/{id}/statistics', [CourseController::class, 'showUserStatistics'])->name('course.user.statistics');
+
+Route::get('/test', [MainClass::class, 'index']);
